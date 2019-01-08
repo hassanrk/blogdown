@@ -1,0 +1,609 @@
+---
+title: Getting Interactive with Shiny
+author: Hassan Rahim Kamil
+date: '2019-01-07'
+slug: getting-interactive-with-shiny
+summary: The greatest value of a picture is when it forces us to notice what we never expected to see.
+categories:
+  - R
+tags:
+  - Shiny
+image:
+  caption: ''
+  focal_point: ''
+  preview_only: true
+
+runtime: shiny
+---
+
+```{r setup-chunk, message = FALSE, warning = FALSE, echo = FALSE}
+pkg_list = c("tidyverse", "ggthemes", "gganimate", "zoo", "png", "gifski", "transformr", "shiny", "shinydashboard")
+mia_pkgs = pkg_list[!(pkg_list %in% installed.packages()[,"Package"])]
+if(length(mia_pkgs) > 0) install.packages(mia_pkgs)
+loaded_pkgs = lapply(pkg_list, require, character.only=TRUE)
+```
+
+```{r plot functions, echo = F}
+
+#Basic plot functions. Used aes_string, instead of aes, so variable of interest must be put in "", e.g.: "race"
+#Need to specify the arguments set to NULL, if FALSE, need to specify TRUE to use the argument
+#Can just use "+" to add more layers to the plot
+
+line_plot = function(df, x.axis, y.axis, fill = NULL, color = NULL) {
+      ggplot(df, 
+             aes_string(x = x.axis, 
+                        y = y.axis, 
+                        colour = color,
+                        fill = fill)) +
+    geom_line() +
+    geom_point(size = 0.5) +
+    theme_bw() +
+    scale_color_tableau() 
+}
+
+
+bar_plot = function(df, x.axis, fill = NULL, color = NULL, dodge = FALSE){
+  
+  if(dodge){
+    ggplot(df, 
+             aes_string(x = x.axis, 
+                        colour = color,
+                        fill = fill)) + 
+    geom_bar(position = "dodge") +
+      theme_bw() +
+      scale_color_tableau()
+  }
+  else{ggplot(df, 
+             aes_string(x = x.axis, 
+                        colour = color,
+                        fill = fill)) + 
+    geom_bar() + 
+      theme_bw() +
+      scale_color_tableau()}
+  
+}
+
+density_plot = function(df, x.axis, fill = NULL, color = NULL) {
+      ggplot(df, 
+             aes_string(x = x.axis, 
+                        colour = color,
+                        fill = fill)) +
+    geom_density() +
+    theme_bw() +
+    scale_color_tableau()
+}
+
+box_plot = function(df, x.axis, y.axis, fill = NULL, color = NULL) {
+      ggplot(df, 
+             aes_string(x = x.axis, 
+                        y = y.axis,
+                        colour = color,
+                        fill = fill)) +
+    geom_boxplot()
+}
+
+
+```
+
+```{r read data, echo = F}
+cases = read.csv("guns.csv")
+```
+
+```{r transform-data, echo = F}
+cases$police = as.factor(as.character(cases$police))
+levels(cases$police)=c("No","Yes")
+cases_new = drop_na(cases)
+
+levels(cases_new$place) = c("Farm", "Home", "Industrial/Construction", "Other Specified", "Other Unspecified", "Residential Institution", "School/Institution", "Sports Facility", "Streets", "Trade/Service Area" )
+```
+
+```{r race data subset, echo= F}
+
+#subsetting `new_cases` by intent
+homicide_cases = filter(cases_new, intent == "Homicide")
+suicide_cases = filter(cases_new, intent == "Suicide")
+accidental_cases = filter(cases_new, intent == "Accidental")
+undetermined_cases = filter(cases_new, intent == "Undetermined")
+
+```
+
+```{r data transformation, echo = F}
+
+#Calculating total cases by intent
+count_transformation = function(x,a){
+   x$count = 1 
+   y = x %>%
+      group_by_(.dots=c("year","month",a)) %>% 
+      summarize(Total_cases = sum(count))
+    y$date = as.factor(paste(as.factor(y$month), as.factor(y$year), sep = "-")) %>%
+      as.yearmon(y$date, format = "%m-%Y")
+    y
+}
+
+accidental_count_race = count_transformation(accidental_cases,"race")
+homicide_count_race = count_transformation(homicide_cases,"race")
+suicide_count_race = count_transformation(suicide_cases,"race")
+undetermined_count_race = count_transformation(undetermined_cases,"race")
+
+accidental_count_sex = count_transformation(accidental_cases, "sex")
+homicide_count_sex = count_transformation(homicide_cases,"sex")
+suicide_count_sex = count_transformation(suicide_cases,"sex")
+undetermined_count_sex = count_transformation(undetermined_cases,"sex")
+
+#string operation (for reactive conductor)
+case_transformation = function(x){
+    x$time = as.factor(paste(as.character(x$year), as.character(x$month), sep="-"))
+    y = x %>%
+        select(time, intent , police, sex, age, race, place, education)
+    y
+}
+
+```
+
+```{r density plot, echo = F, message = F, warning=F}
+density_plot(cases_new, "age", color = "race") +
+  theme_bw() + 
+  scale_color_stata() +
+  scale_y_continuous(labels = scales::percent, name = "probability") +
+  theme_bw() +
+  scale_color_tableau() +
+  labs(title = "Gun-Related Deaths in {closest_state}") +
+  transition_states(place,
+                    transition_length = 2,
+                    state_length = 1) +
+  ease_aes('cubic-in-out')
+      
+```
+
+> The greatest value of a picture is when it forces us to notice what we never expected to see.
+>
+> --- **John Tukey**
+
+I remember taking a class with [coatless](https://thecoatlessprofessor.com/) while I was still in my third year of undergraduate, completely devoid of any programming language. He struck upon me as a teacher who was *ridiculously* enthusiastic about R, though was passionate and careful in explaining the fundamental concepts to his students. In one of his lessons, he talked about an app called [Shiny](https://shiny.rstudio.com/) that provides an interactive **Live** interface with the user. Sounds cool? Well, it is. More so, it is one of the things in programming that forces interactivity between a human and a computer. Just think about the endless possibility!
+
+Here is a Shiny app that uses [voice recognition](https://yihui.shinyapps.io/voice/).
+
+Shiny builds on the idea that one can build interactive web apps straight from R. It has two main components, a user interface (UI) and a server. A server is typically defined as the *backend* of data retrieval and functionality that perform all the transformations, while the UI serves as the *frontend* or *client-side* where a user interacts accordingly given a set of inputs, sort of like how the customer service/service provider works.
+
+As an activity, I was told to visualize data on a Shiny app and interpret the results. I carefully picked a topic and decided to do a project about gun-related deaths in the United States. I gathered a dataset from [FiveThirtyEight](https://github.com/fivethirtyeight/guns-data/blob/master/full_data.csv) that has data collected by the [Centers for Disease Control and Prevention (CDC)](https://www.cdc.gov/) on gun-related deaths from the year 2012 to 2014. Fast forward the data wrangling, we are ready to build a Shiny app.
+
+Let’s start by building the UI template for our Shiny app. ([final product](#shiny_app))
+
+#### **Step 1: Define a `UI`**.
+
+```{r ui template, eval = F}
+
+library(shiny)
+
+ui = shinyUI(
+  fluidPage(
+    titlePanel("Gun-Related Deaths in the United States (2012-2014)"), #Title
+    sidebarLayout(
+      sidebarPanel(
+        h1("This is my input")
+      ),
+      mainPanel("This is my output")
+    ) # close: sidebarLayout()
+  ) # close: fluidPage()
+) # close: shinyUI()
+
+server = function(input, output){}
+
+shinyApp(ui, server)
+```
+
+![](/post/getting-interactive-with-shiny/index_files/ui 1.png)
+
+This is the raw backbone behind our Shiny app. For our app, we want to make four different types of visualization, so ideally we would want four different tabs. To achieve that, we would use `tabsetPanel()` and within it, four `tabPanel()`'s, in which we would include the same structure as we did previously. I shortened "Explanatory Data Analysis" to just EDA.
+
+```{r ui template 2, eval = F}
+
+library(shiny)
+
+ui = fluidPage(
+  titlePanel("Gun-Related Deaths in the United States (2012-2014)"),
+  tabsetPanel(
+    tabPanel("Quantitative EDA", fluid = TRUE,           #tab 1
+             sidebarLayout(
+               sidebarPanel(
+                 h3("Data Selection")
+                 ),
+               mainPanel(
+                 h3("Head of the Dataset"),
+                 h3("Dataset Summary")
+                 )
+               )
+             ),
+    tabPanel("Visual EDA - Time Series", fluid = TRUE,   #tab 2
+             sidebarLayout(
+               sidebarPanel(
+                 h3("Type of Graph")
+                 ),
+               mainPanel(
+                 h3("Trendlines")
+                 )
+               )
+             ),
+    tabPanel("Visual EDA - Discrete", fluid = TRUE,      #tab 3
+             sidebarLayout(
+               sidebarPanel(
+                 h3("Type of Graph")
+                 ),
+               mainPanel(
+                 h3("Discrete Variable")
+                 )
+               )
+             ),
+    tabPanel("Visual EDA - Continuous", fluid = TRUE,    #tab 4
+             sidebarLayout(
+               sidebarPanel(
+                 h3("Type of Graph")
+                 ),
+               mainPanel(
+                 h3("Continuous Varible")
+                 )
+               )
+             )
+    )
+  )
+    
+server = function(input, output) {}
+
+shinyApp(ui, server)
+
+```
+
+![](/post/getting-interactive-with-shiny/index_files/ui 2.png)
+
+Next, we would want to define control widgets to feed our active inputs. To that end, we would want to use `numericInput()`, `selectInput()` and `radioButtons()`. A list of other control widgets can be found on the [Shiny cheatsheet](https://shiny.rstudio.com/images/shiny-cheatsheet.pdf). We would also want to add `submitButton()` to prevent reaction on the entire app.
+
+```{r ui 3, eval = F}
+
+ui = fluidPage(
+  titlePanel("Gun-Related Deaths in the United States (2012-2014)"),
+  tabsetPanel(
+    tabPanel("Quantitative EDA", fluid = TRUE,
+             sidebarLayout(
+               sidebarPanel(
+                 h3("Data Selection"),
+                 numericInput(inputId = "obs", 
+                              label = "Number of Observations:", 
+                              value = 3),                                   #numeric input
+                 submitButton(text="View EDA")                              #submit button
+                 ),
+               mainPanel(
+                 h3("Head of the Dataset"),
+                 h3("Dataset Summary")
+                 )
+               )
+             ),
+    tabPanel("Visual EDA - Time Series", fluid = TRUE,
+             sidebarLayout(
+               sidebarPanel(
+                 h3("Type of Graph"),
+                 radioButtons(inputId = "intent", 
+                              label = "Intent:", 
+                              choices = levels(cases_new$intent), 
+                              selected = "Homicide"),                        #checkbox
+                 selectInput(inputId = "trendline_color", 
+                             label = "Color:", 
+                             choices = colnames(cases_new)[c(5:6,8,10:11)], 
+                             selected = "race"),                             #dropdown
+                 submitButton(text="View EDA")                               #submit button
+                 ),
+               mainPanel(
+                 h3("Trendlines")
+                 )
+               )
+             ),
+    tabPanel("Visual EDA - Discrete", fluid = TRUE,
+             sidebarLayout(
+               sidebarPanel(
+                 h3("Type of Graph"),
+                 radioButtons(inputId = "variable", 
+                              label = "Variable:", 
+                              choices = colnames(cases_new)[c(4:6,8,10:11)], 
+                              selected = "intent"),                           #checkbox
+                 selectInput(inputId = "discrete_color", 
+                             label = "Color:", 
+                             choices = colnames(cases_new)[c(4:6,8,10:11)], 
+                             selected = "race"),                              #dropdown
+                 submitButton(text="View EDA")                                #submit button
+                 ),
+               mainPanel(
+                 h3("Discrete Variable")
+                 )
+               )
+             ),
+    tabPanel("Visual EDA - Continuous", fluid = TRUE,
+             sidebarLayout(
+               sidebarPanel(
+                 h3("Type of Graph"),
+                 h5("Independent Variable: Age"),
+                 radioButtons(inputId = "plot_type", 
+                              label = "Plot:", 
+                              choices = c("density plot","box plot"), 
+                              selected = "density plot"),                     #checkbox
+                 selectInput(inputId = "continuous_color", 
+                             label = "Color:", 
+                             choices = colnames(cases_new)[c(4:6,8,10:11)], 
+                             selected = "race"),                              #dropdown
+                 submitButton(text="View EDA")                                #submit button
+                 ),
+               mainPanel(
+                 h3("Continuous Varible")
+                 )
+               )
+             )
+    )
+  )
+
+server = function(input, output) {}
+
+shinyApp(ui, server)
+
+```
+
+![](/post/getting-interactive-with-shiny/index_files/ui 3.png)
+
+The `inputID` argument in each widget function will be used to call out our inputs when we feed them into the server.
+
+Then, we would want to define the types of output within each `mainPanel()` that we would want to show on the UI. The output on the UI will work hand-in-hand with the `render*()` functions in the server. Again, for a list of them, check the [cheatsheet](https://shiny.rstudio.com/images/shiny-cheatsheet.pdf).
+
+```{r ui 4, eval = F}
+
+ui = fluidPage(
+  titlePanel("Gun-Related Deaths in the United States (2012-2014)"),
+  tabsetPanel(
+    tabPanel("Quantitative EDA", fluid = TRUE,
+             sidebarLayout(
+               sidebarPanel(
+                 h3("Data Selection"),
+                 numericInput(inputId = "obs", 
+                              label = "Number of Observations:", 
+                              value = 3),
+                 submitButton(text="View EDA")
+                 ),
+               mainPanel(
+                 h3("Head of the Dataset"),
+                 tableOutput("view"),                             #table output
+                 h3("Dataset Summary"),
+                 verbatimTextOutput("summary")                    #text output
+                 )
+               )
+             ),
+    tabPanel("Visual EDA - Time Series", fluid = TRUE,
+             sidebarLayout(
+               sidebarPanel(
+                 h3("Type of Graph"),
+                 radioButtons(inputId = "intent", 
+                              label = "Intent:", 
+                              choices = levels(cases_new$intent), 
+                              selected = "Homicide"),
+                 selectInput(inputId = "trendline_color", 
+                             label = "Color:", 
+                             choices = colnames(cases_new)[c(5:6,8,10:11)], 
+                             selected = "race"),
+                 submitButton(text="View EDA")
+                 ),
+               mainPanel(
+                 h3("Trendlines"),
+                 plotOutput("plot1")                               #plot output
+                 )
+               )
+             ),
+    tabPanel("Visual EDA - Discrete", fluid = TRUE,
+             sidebarLayout(
+               sidebarPanel(
+                 h3("Type of Graph"),
+                 radioButtons(inputId = "variable", 
+                              label = "Variable:", 
+                              choices = colnames(cases_new)[c(4:6,8,10:11)], 
+                              selected = "intent"),
+                 selectInput(inputId = "discrete_color", 
+                             label = "Color:", 
+                             choices = colnames(cases_new)[c(4:6,8,10:11)], 
+                             selected = "race"),
+                 submitButton(text="View EDA")
+                 ),
+               mainPanel(
+                 h3("Discrete Variable"),
+                 plotOutput("plot2")                                #plot output
+                 )
+               )
+             ),
+    tabPanel("Visual EDA - Continuous", fluid = TRUE,
+             sidebarLayout(
+               sidebarPanel(
+                 h3("Type of Graph"),
+                 h5("Independent Variable: Age"),
+                 radioButtons(inputId = "plot_type", 
+                              label = "Plot:", 
+                              choices = c("density plot","box plot"), 
+                              selected = "density plot"),
+                 selectInput(inputId = "continuous_color", 
+                             label = "Color:", 
+                             choices = colnames(cases_new)[c(4:6,8,10:11)], 
+                             selected = "race"),
+                 submitButton(text="View EDA")
+                 ),
+               mainPanel(
+                 h3("Continuous Varible"),
+                 plotOutput("plot3")                                 #plot output
+                 )
+               )
+             )
+    )
+  )
+
+server = function(input, output) {}
+
+shinyApp(ui, server)
+
+
+```
+
+#### **Step 2: Define a `server`**.
+
+After all that is done, now on to the "easier" part. For our server, we require two basic things: a reactive source (which we would call as the *input*) and a reactive endpoint (which we would call as the *output*), to which we will attempt to connect the two of them. As an intermediary point, we would also define a reactive conductor using the `reactive({})` call in `shiny`. Based on the previous input and output defined on our UI, we will update our `server` function with the following:
+
+(For a list of `render*()` functions, check [cheatsheet](https://shiny.rstudio.com/images/shiny-cheatsheet.pdf).)
+```{r update server, eval = F}
+
+ui = fluidPage(
+  titlePanel("Gun-Related Deaths in the United States (2012-2014)"),
+  tabsetPanel(
+    tabPanel("Quantitative EDA", fluid = TRUE,
+             sidebarLayout(
+               sidebarPanel(
+                 h3("Data Selection"),
+                 numericInput(inputId = "obs", 
+                              label = "Number of Observations:", 
+                              value = 3),
+                 submitButton(text="View EDA")
+                 ),
+               mainPanel(
+                 h3("Head of the Dataset"),
+                 tableOutput("view"),                             
+                 h3("Dataset Summary"),
+                 verbatimTextOutput("summary")                    
+                 )
+               )
+             ),
+    tabPanel("Visual EDA - Time Series", fluid = TRUE,
+             sidebarLayout(
+               sidebarPanel(
+                 h3("Type of Graph"),
+                 radioButtons(inputId = "intent", 
+                              label = "Intent:", 
+                              choices = levels(cases_new$intent), 
+                              selected = "Homicide"),
+                 selectInput(inputId = "trendline_color", 
+                             label = "Color:", 
+                             choices = colnames(cases_new)[c(5:6,8,10:11)], 
+                             selected = "race"),
+                 submitButton(text="View EDA")
+                 ),
+               mainPanel(
+                 h3("Trendlines"),
+                 plotOutput("plot1")                               
+                 )
+               )
+             ),
+    tabPanel("Visual EDA - Discrete", fluid = TRUE,
+             sidebarLayout(
+               sidebarPanel(
+                 h3("Type of Graph"),
+                 radioButtons(inputId = "variable", 
+                              label = "Variable:", 
+                              choices = colnames(cases_new)[c(4:6,8,10:11)], 
+                              selected = "intent"),
+                 selectInput(inputId = "discrete_color", 
+                             label = "Color:", 
+                             choices = colnames(cases_new)[c(4:6,8,10:11)], 
+                             selected = "race"),
+                 submitButton(text="View EDA")
+                 ),
+               mainPanel(
+                 h3("Discrete Variable"),
+                 plotOutput("plot2")                                
+                 )
+               )
+             ),
+    tabPanel("Visual EDA - Continuous", fluid = TRUE,
+             sidebarLayout(
+               sidebarPanel(
+                 h3("Type of Graph"),
+                 h5("Independent Variable: Age"),
+                 radioButtons(inputId = "plot_type", 
+                              label = "Plot:", 
+                              choices = c("density plot","box plot"), 
+                              selected = "density plot"),
+                 selectInput(inputId = "continuous_color", 
+                             label = "Color:", 
+                             choices = colnames(cases_new)[c(4:6,8,10:11)], 
+                             selected = "race"),
+                 submitButton(text="View EDA")
+                 ),
+               mainPanel(
+                 h3("Continuous Varible"),
+                 plotOutput("plot3")                                 
+                 )
+               )
+             )
+    )
+  )
+
+server = function(input, output) {
+  active_dataset_trendline= reactive({
+    if(input$intent == "Homicide") {
+      count_transformation(homicide_cases, input$trendline_color)
+      } else if (input$intent == "Suicide") {
+        count_transformation(suicide_cases, input$trendline_color)
+        } else if(input$intent == "Accidental"){
+          count_transformation(accidental_cases, input$trendline_color)
+            } else if (input$intent == "Undetermined"){
+              count_transformation(undetermined_cases, input$trendline_color)
+            }
+        })    #reactive conductor, i.e. transformed dataset
+  
+  active_graph= reactive({
+    if(input$plot_type == "density plot") {
+      density_plot(cases_new, "age", color = input$continuous_color) +
+        labs(title = paste("Deaths: age by",input$continuous_color))
+            } else if (input$plot_type == "box plot") {
+                box_plot(cases_new, input$continuous_color, "age", color = input$continuous_color) + 
+                theme(axis.text.x = element_text(angle = 65, hjust = 1)) +
+                labs(title = paste("Deaths: age by",input$continuous_color))
+            }
+        })    #reactive conductor, i.e. desired output for tab 4. 
+              #Note~ a reactive conductor can be called again to act as an endpoint.
+        
+  output$view = renderTable({
+    head(case_transformation(cases_new),n = input$obs)
+    })
+  output$summary = renderPrint({
+    summary(case_transformation(cases_new))
+    })        #output for tab 1
+
+  output$plot1 = renderPlot({
+    line_plot(active_dataset_trendline(), "date", "Total_cases", color = input$trendline_color) + 
+      labs(title = paste("Deaths:", input$intent,"by",input$trendline_color),  x = "Date", y = "Total Cases")
+    })         #output for tab 2
+  
+  output$plot2 = renderPlot({
+    bar_plot(cases_new, input$variable, fill = input$discrete_color, dodge = TRUE) + 
+      theme(axis.text.x = element_text(angle = 65, hjust = 1)) +
+      labs(title = paste("Deaths:", input$variable,"by",input$discrete_color))
+    })         #output for tab 3
+
+  output$plot3 = renderPlot({
+    active_graph()
+    })         #output for tab 4
+}
+
+shinyApp(ui, server)
+
+```
+
+Now, we are basically done. Our app/dashboard is finished! We now henceforth have the choice to publish our app on a [shinyapps.io](https://www.shinyapps.io/) live server for other people to use, like I have for mine. 
+
+<a id="shiny_app"></a>
+
+**The Final Product [link to app](https://hassan-rk.shinyapps.io/gun_deaths/):**
+
+<iframe width="500" height="450" scrolling="yes" frameborder="yes" src="https://hassan-rk.shinyapps.io/gun_deaths/"></iframe>
+
+You could also follow the same logic to give your dashboard a more crisp look by downloading the themes from the [shinydashboard](https://rstudio.github.io/shinydashboard/get_started.html) package available on CRAN.
+
+
+***
+
+### Small (perhaps Related) Discussion
+
+Now, to us statisticians (or data scientists), why does this matter? Why went through such lengths to produce this type of result? When I first took a programming class with coatless, I asked myself the same question too, to realize later how important it was as I took other statistics classes. 
+
+Without reservation, one rarely doubts the mental acuity of a statistician to produce meaningful work. However, in some cases, even the prolific ones aren't the best at communicating their results, which is why having tools such as this is so important. Growing up, I used to be a big fan of Richard Feynman, the physicist known for his "eccentric" (or rather, unique) way of explaining difficult concepts in physics. I often listened to his videos while doing my math homeworks, which not only did it supply me with the motivation, but also imparted a philosophy within me that (truthfully) not many people have---that is, to explain with clarity and brevity so much so even the most distant layman could understand. And that that sometimes requires intellectual humility and empathy to put our ourselves in others' shoes.
+
+So, communicate with the intent to be understood.
+
