@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Haikus on Hassan Rahim Kamil</title>
+    <link>/haikus/</link>
+    <description>Recent content in Haikus on Hassan Rahim Kamil</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>&amp;copy; 2018</copyright>
+    
+	<atom:link href="/haikus/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title></title>
+      <link>/haikus/1/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/haikus/1/</guid>
+      <description>i
+Sounds of needle leaves
+bristle through my ears over
+the sunbled streamlet
+ii
+Clinking of pennies
+at an affluent building,
+a bedridden pauper
+iii
+Swans in ballet shoes
+under the spotlit bedlam
+tip toe, tippy toe
+iv
+A single mother
+And in her sinewy arms
+rests a smiling child
+v
+Robins chirruping
+under the blanket of clouds
+near the verdant meadow
+vi
+City lights and roads
+stand witness to waste flyers</description>
+    </item>
+    
+  </channel>
+</rss>

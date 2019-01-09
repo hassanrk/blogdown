@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Shiny on Hassan Rahim Kamil</title>
+    <link>/tags/shiny/</link>
+    <description>Recent content in Shiny on Hassan Rahim Kamil</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>&amp;copy; 2018</copyright>
+    <lastBuildDate>Mon, 07 Jan 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/tags/shiny/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Getting Interactive with Shiny</title>
+      <link>/post/getting-interactive-with-shiny/getting-interactive-with-shiny/</link>
+      <pubDate>Mon, 07 Jan 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/post/getting-interactive-with-shiny/getting-interactive-with-shiny/</guid>
+      <description>The greatest value of a picture is when it forces us to notice what we never expected to see.
+— John Tukey
+ I remember taking a class with coatless while I was still in my third year of undergraduate, completely devoid of any programming language. He struck upon me as a teacher who was ridiculously enthusiastic about R, though was passionate and careful in explaining the fundamental concepts to his students.</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Source Themes Academic 3.3.0">
+  <meta name="generator" content="Hugo 0.53" />
+  <meta name="author" content="Hassan Rahim Kamil">
+
+  
+  
+  
+  
+    
+  
+  <meta name="description" content="The greatest value of a picture is when it forces us to notice what we never expected to see.
+— John Tukey
+ I remember taking a class with coatless while I was still in my third year of undergraduate, completely devoid of any programming language. He struck upon me as a teacher who was ridiculously enthusiastic about R, though was passionate and careful in explaining the fundamental concepts to his students.">
+
+  
+  <link rel="alternate" hreflang="en-us" href="/post/getting-interactive-with-shiny/">
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <meta name="theme-color" content="#5a7eae">
+  
+
+  
+  
+  
+  
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha256-eSi1q2PG6J7g7ib17yAaWMcrr5GrtohYChqibrV7PBE=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.6/css/academicons.min.css" integrity="sha256-uFVgMKfistnJAfoCUQigIl+JfUaP47GrRKjf6CTPVmw=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.0/css/all.css" integrity="sha384-aOkxzJ5uQz7WBObEZcHvV5JvRW3TUc2rNPA7pe3AwnsUohiw1Vj2Rgx2KSOkF5+h" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" integrity="sha256-ygkqlh3CYSUri3LhQxzdcm0n1EQvH2Y+U5S2idbLtxs=" crossorigin="anonymous">
+
+    
+    
+    
+      
+    
+    
+      
+      
+        
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" crossorigin="anonymous">
+        
+      
+    
+
+    
+
+    
+
+  
+
+  
+  
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Montserrat:400,700|Roboto:400,400italic,700|Roboto+Mono">
+  
+
+  <link rel="stylesheet" href="/styles.css">
+  
+  <link rel="stylesheet" href="/css/blue.css">
+  
+
+  
+  
+  
+
+  
+  <link rel="alternate" href="/index.xml" type="application/rss+xml" title="Hassan Rahim Kamil">
+  <link rel="feed" href="/index.xml" type="application/rss+xml" title="Hassan Rahim Kamil">
+  
+
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="icon" type="image/png" href="/img/icon.png">
+  <link rel="apple-touch-icon" type="image/png" href="/img/icon-192.png">
+
+  <link rel="canonical" href="/post/getting-interactive-with-shiny/">
+
+  
+  
+  
+  
+    
+  
+  <meta property="twitter:card" content="summary_large_image">
+  
+  <meta property="og:site_name" content="Hassan Rahim Kamil">
+  <meta property="og:url" content="/post/getting-interactive-with-shiny/">
+  <meta property="og:title" content="Getting Interactive with Shiny | Hassan Rahim Kamil">
+  <meta property="og:description" content="The greatest value of a picture is when it forces us to notice what we never expected to see.
+— John Tukey
+ I remember taking a class with coatless while I was still in my third year of undergraduate, completely devoid of any programming language. He struck upon me as a teacher who was ridiculously enthusiastic about R, though was passionate and careful in explaining the fundamental concepts to his students."><meta property="og:image" content="/post/getting-interactive-with-shiny/featured.png">
+  <meta property="og:locale" content="en-us">
+  
+  <meta property="article:published_time" content="2019-01-07T00:00:00&#43;00:00">
+  
+  <meta property="article:modified_time" content="2019-01-07T00:00:00&#43;00:00">
+  
+
+  
+
+  
+
+  <title>Getting Interactive with Shiny | Hassan Rahim Kamil</title>
+
+</head>
+<body id="top" data-spy="scroll" data-target="#TableOfContents" data-offset="71" >
+  <aside class="search-results" id="search">
+  <div class="container">
+    <section class="search-header">
+
+      <div class="row no-gutters justify-content-between mb-3">
+        <div class="col-6">
+          <h1>Search</h1>
+        </div>
+        <div class="col-6 col-search-close">
+          <a class="js-search" href="#"><i class="fas fa-times-circle text-muted" aria-hidden="true"></i></a>
+        </div>
+      </div>
+
+      <div id="search-box">
+        
+        <input name="q" id="search-query" placeholder="Search..." autocapitalize="off"
+        autocomplete="off" autocorrect="off" role="textbox" spellcheck="false" type="search">
+        
+      </div>
+
+    </section>
+    <section class="section-search-results">
+
+      <div id="search-hits">
+        
+      </div>
+
+    </section>
+  </div>
+</aside>
+
+
+<nav class="navbar navbar-light fixed-top navbar-expand-lg py-0" id="navbar-main">
+  <div class="container">
+
+    
+      <a class="navbar-brand" href="/">Hassan Rahim Kamil</a>
+      
+      <button type="button" class="navbar-toggler" data-toggle="collapse"
+              data-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+        <span><i class="fas fa-bars"></i></span>
+      </button>
+      
+
+    
+    <div class="collapse navbar-collapse" id="navbar">
+
+      
+      
+      <ul class="navbar-nav ml-auto">
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#about">
+            
+            <span>Home</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#posts">
+            
+            <span>Posts</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#projects">
+            
+            <span>Projects</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#softwares">
+            
+            <span>Softwares</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#contact">
+            
+            <span>Contact</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+      
+
+        
+
+        
+        <li class="nav-item">
+          <a class="nav-link js-search" href="#"><i class="fas fa-search" aria-hidden="true"></i></a>
+        </li>
+        
+
+        
+
+        
+        <li class="nav-item">
+          <a class="nav-link js-dark-toggle" href="#"><i class="fas fa-moon" aria-hidden="true"></i></a>
+        </li>
+        
+
+      </ul>
+
+    </div>
+  </div>
+</nav>
+
+
+<article class="article" itemscope itemtype="http://schema.org/Article">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+  
+  
+<div class="article-container pt-3">
+  <h1 itemprop="name">Getting Interactive with Shiny</h1>
+
+  
+
+  
+    
+
+<div class="article-metadata">
+
+  
+  
+  <span itemscope itemprop="author" itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Hassan Rahim Kamil">
+  </span>
+  
+
+  <span class="article-date">
+    
+    <meta content="2019-01-07 00:00:00 &#43;0000 UTC" itemprop="datePublished">
+    <time datetime="2019-01-07 00:00:00 &#43;0000 UTC" itemprop="dateModified">
+      Jan 7, 2019
+    </time>
+  </span>
+  <span itemscope itemprop="publisher" itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Hassan Rahim Kamil">
+  </span>
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    9 min read
+  </span>
+  
+
+  
+  
+
+  
+  
+  
+  <span class="middot-divider"></span>
+  <span class="article-categories">
+    <i class="fas fa-folder"></i>
+    
+    <a href="/categories/r/">R</a>
+    
+  </span>
+  
+  
+
+  
+  
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    <li>
+      <a class="twitter"
+         href="https://twitter.com/intent/tweet?text=Getting%20Interactive%20with%20Shiny&amp;url=%2fpost%2fgetting-interactive-with-shiny%2f"
+         target="_blank" rel="noopener">
+        <i class="fab fa-twitter"></i>
+      </a>
+    </li>
+    <li>
+      <a class="facebook"
+         href="https://www.facebook.com/sharer.php?u=%2fpost%2fgetting-interactive-with-shiny%2f"
+         target="_blank" rel="noopener">
+        <i class="fab fa-facebook-f"></i>
+      </a>
+    </li>
+    <li>
+      <a class="linkedin"
+         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=%2fpost%2fgetting-interactive-with-shiny%2f&amp;title=Getting%20Interactive%20with%20Shiny"
+         target="_blank" rel="noopener">
+        <i class="fab fa-linkedin-in"></i>
+      </a>
+    </li>
+    <li>
+      <a class="weibo"
+         href="http://service.weibo.com/share/share.php?url=%2fpost%2fgetting-interactive-with-shiny%2f&amp;title=Getting%20Interactive%20with%20Shiny"
+         target="_blank" rel="noopener">
+        <i class="fab fa-weibo"></i>
+      </a>
+    </li>
+    <li>
+      <a class="email"
+         href="mailto:?subject=Getting%20Interactive%20with%20Shiny&amp;body=%2fpost%2fgetting-interactive-with-shiny%2f">
+        <i class="fas fa-envelope"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+  
+
+</div>
+
+    
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+  
+</div>
+
+
+
+  <div class="article-container">
+
+    <div class="article-style" itemprop="articleBody">
+      
+
+
+<p><img src="/post/getting-interactive-with-shiny/index_files/figure-html/density%20plot-1.gif" /><!-- --></p>
+<blockquote>
+<p>The greatest value of a picture is when it forces us to notice what we never expected to see.</p>
+<p>— <strong>John Tukey</strong></p>
+</blockquote>
+<p>I remember taking a class with <a href="https://thecoatlessprofessor.com/">coatless</a> while I was still in my third year of undergraduate, completely devoid of any programming language. He struck upon me as a teacher who was <em>ridiculously</em> enthusiastic about R, though was passionate and careful in explaining the fundamental concepts to his students. In one of his lessons, he talked about an app called <a href="https://shiny.rstudio.com/">Shiny</a> that provides an interactive <strong>Live</strong> interface with the user. Sounds cool? Well, it is. More so, it is one of the things in programming that forces interactivity between a human and a computer. Just think about the endless possibility!</p>
+<p>Here is a Shiny app that uses <a href="https://yihui.shinyapps.io/voice/">voice recognition</a>.</p>
+<p>Shiny builds on the idea that one can build interactive web apps straight from R. It has two main components, a user interface (UI) and a server. A server is typically defined as the <em>backend</em> of data retrieval and functionality that perform all the transformations, while the UI serves as the <em>frontend</em> or <em>client-side</em> where a user interacts accordingly given a set of inputs, sort of like how the customer service/service provider works.</p>
+<p>As an activity, I was told to visualize data on a Shiny app and interpret the results. I carefully picked a topic and decided to do a project about gun-related deaths in the United States. I gathered a dataset from <a href="https://github.com/fivethirtyeight/guns-data/blob/master/full_data.csv">FiveThirtyEight</a> that has data collected by the <a href="https://www.cdc.gov/">Centers for Disease Control and Prevention (CDC)</a> on gun-related deaths from the year 2012 to 2014. Fast forward the data wrangling, we are ready to build a Shiny app.</p>
+<p>Let’s start by building the UI template for our Shiny app.</p>
+<div id="step-1-define-a-ui." class="section level4">
+<h4><strong>Step 1: Define a <code>UI</code></strong>.</h4>
+<pre class="r"><code>library(shiny)
+
+ui = shinyUI(
+  fluidPage(
+    titlePanel(&quot;Gun-Related Deaths in the United States (2012-2014)&quot;), #Title
+    sidebarLayout(
+      sidebarPanel(
+        h1(&quot;This is my input&quot;)
+      ),
+      mainPanel(&quot;This is my output&quot;)
+    ) # close: sidebarLayout()
+  ) # close: fluidPage()
+) # close: shinyUI()
+
+server = function(input, output){}
+
+shinyApp(ui, server)</code></pre>
+<div class="figure">
+<img src="/post/getting-interactive-with-shiny/index_files/ui%201.png" />
+
+</div>
+<p>This is the raw backbone behind our Shiny app. For our app, we want to make four different types of visualization, so ideally we would want four different tabs. To achieve that, we would use <code>tabsetPanel()</code> and within it, four <code>tabPanel()</code>’s, in which we would include the same structure as we did previously. I shortened “Explanatory Data Analysis” to just EDA.</p>
+<pre class="r"><code>library(shiny)
+
+ui = fluidPage(
+  titlePanel(&quot;Gun-Related Deaths in the United States (2012-2014)&quot;),
+  tabsetPanel(
+    tabPanel(&quot;Quantitative EDA&quot;, fluid = TRUE,           #tab 1
+             sidebarLayout(
+               sidebarPanel(
+                 h3(&quot;Data Selection&quot;)
+                 ),
+               mainPanel(
+                 h3(&quot;Head of the Dataset&quot;),
+                 h3(&quot;Dataset Summary&quot;)
+                 )
+               )
+             ),
+    tabPanel(&quot;Visual EDA - Time Series&quot;, fluid = TRUE,   #tab 2
+             sidebarLayout(
+               sidebarPanel(
+                 h3(&quot;Type of Graph&quot;)
+                 ),
+               mainPanel(
+                 h3(&quot;Trendlines&quot;)
+                 )
+               )
+             ),
+    tabPanel(&quot;Visual EDA - Discrete&quot;, fluid = TRUE,      #tab 3
+             sidebarLayout(
+               sidebarPanel(
+                 h3(&quot;Type of Graph&quot;)
+                 ),
+               mainPanel(
+                 h3(&quot;Discrete Variable&quot;)
+                 )
+               )
+             ),
+    tabPanel(&quot;Visual EDA - Continuous&quot;, fluid = TRUE,    #tab 4
+             sidebarLayout(
+               sidebarPanel(
+                 h3(&quot;Type of Graph&quot;)
+                 ),
+               mainPanel(
+                 h3(&quot;Continuous Varible&quot;)
+                 )
+               )
+             )
+    )
+  )
+    
+server = function(input, output) {}
+
+shinyApp(ui, server)</code></pre>
+<div class="figure">
+<img src="/post/getting-interactive-with-shiny/index_files/ui%202.png" />
+
+</div>
+<p>Next, we would want to define control widgets to feed our active inputs. To that end, we would want to use <code>numericInput()</code>, <code>selectInput()</code> and <code>radioButtons()</code>. A list of other control widgets can be found on the <a href="https://shiny.rstudio.com/images/shiny-cheatsheet.pdf">Shiny cheatsheet</a>. We would also want to add <code>submitButton()</code> to prevent reaction on the entire app.</p>
+<pre class="r"><code>ui = fluidPage(
+  titlePanel(&quot;Gun-Related Deaths in the United States (2012-2014)&quot;),
+  tabsetPanel(
+    tabPanel(&quot;Quantitative EDA&quot;, fluid = TRUE,
+             sidebarLayout(
+               sidebarPanel(
+                 h3(&quot;Data Selection&quot;),
+                 numericInput(inputId = &quot;obs&quot;, 
+                              label = &quot;Number of Observations:&quot;, 
+                              value = 3),                                   #numeric input
+                 submitButton(text=&quot;View EDA&quot;)                              #submit button
+                 ),
+               mainPanel(
+                 h3(&quot;Head of the Dataset&quot;),
+                 h3(&quot;Dataset Summary&quot;)
+                 )
+               )
+             ),
+    tabPanel(&quot;Visual EDA - Time Series&quot;, fluid = TRUE,
+             sidebarLayout(
+               sidebarPanel(
+                 h3(&quot;Type of Graph&quot;),
+                 radioButtons(inputId = &quot;intent&quot;, 
+                              label = &quot;Intent:&quot;, 
+                              choices = levels(cases_new$intent), 
+                              selected = &quot;Homicide&quot;),                        #checkbox
+                 selectInput(inputId = &quot;trendline_color&quot;, 
+                             label = &quot;Color:&quot;, 
+                             choices = colnames(cases_new)[c(5:6,8,10:11)], 
+                             selected = &quot;race&quot;),                             #dropdown
+                 submitButton(text=&quot;View EDA&quot;)                               #submit button
+                 ),
+               mainPanel(
+                 h3(&quot;Trendlines&quot;)
+                 )
+               )
+             ),
+    tabPanel(&quot;Visual EDA - Discrete&quot;, fluid = TRUE,
+             sidebarLayout(
+               sidebarPanel(
+                 h3(&quot;Type of Graph&quot;),
+                 radioButtons(inputId = &quot;variable&quot;, 
+                              label = &quot;Variable:&quot;, 
+                              choices = colnames(cases_new)[c(4:6,8,10:11)], 
+                              selected = &quot;intent&quot;),                           #checkbox
+                 selectInput(inputId = &quot;discrete_color&quot;, 
+                             label = &quot;Color:&quot;, 
+                             choices = colnames(cases_new)[c(4:6,8,10:11)], 
+                             selected = &quot;race&quot;),                              #dropdown
+                 submitButton(text=&quot;View EDA&quot;)                                #submit button
+                 ),
+               mainPanel(
+                 h3(&quot;Discrete Variable&quot;)
+                 )
+               )
+             ),
+    tabPanel(&quot;Visual EDA - Continuous&quot;, fluid = TRUE,
+             sidebarLayout(
+               sidebarPanel(
+                 h3(&quot;Type of Graph&quot;),
+                 h5(&quot;Independent Variable: Age&quot;),
+                 radioButtons(inputId = &quot;plot_type&quot;, 
+                              label = &quot;Plot:&quot;, 
+                              choices = c(&quot;density plot&quot;,&quot;box plot&quot;), 
+                              selected = &quot;density plot&quot;),                     #checkbox
+                 selectInput(inputId = &quot;continuous_color&quot;, 
+                             label = &quot;Color:&quot;, 
+                             choices = colnames(cases_new)[c(4:6,8,10:11)], 
+                             selected = &quot;race&quot;),                              #dropdown
+                 submitButton(text=&quot;View EDA&quot;)                                #submit button
+                 ),
+               mainPanel(
+                 h3(&quot;Continuous Varible&quot;)
+                 )
+               )
+             )
+    )
+  )
+
+server = function(input, output) {}
+
+shinyApp(ui, server)</code></pre>
+<div class="figure">
+<img src="/post/getting-interactive-with-shiny/index_files/ui%203.png" />
+
+</div>
+<p>The <code>inputID</code> argument in each widget function will be used to call out our inputs when we feed them into the server.</p>
+<p>Then, we would want to define the types of output within each <code>mainPanel()</code> that we would want to show on the UI. The output on the UI will work hand-in-hand with the <code>render*()</code> functions in the server. Again, for a list of them, check the <a href="https://shiny.rstudio.com/images/shiny-cheatsheet.pdf">cheatsheet</a>.</p>
+<pre class="r"><code>ui = fluidPage(
+  titlePanel(&quot;Gun-Related Deaths in the United States (2012-2014)&quot;),
+  tabsetPanel(
+    tabPanel(&quot;Quantitative EDA&quot;, fluid = TRUE,
+             sidebarLayout(
+               sidebarPanel(
+                 h3(&quot;Data Selection&quot;),
+                 numericInput(inputId = &quot;obs&quot;, 
+                              label = &quot;Number of Observations:&quot;, 
+                              value = 3),
+                 submitButton(text=&quot;View EDA&quot;)
+                 ),
+               mainPanel(
+                 h3(&quot;Head of the Dataset&quot;),
+                 tableOutput(&quot;view&quot;),                             #table output
+                 h3(&quot;Dataset Summary&quot;),
+                 verbatimTextOutput(&quot;summary&quot;)                    #text output
+                 )
+               )
+             ),
+    tabPanel(&quot;Visual EDA - Time Series&quot;, fluid = TRUE,
+             sidebarLayout(
+               sidebarPanel(
+                 h3(&quot;Type of Graph&quot;),
+                 radioButtons(inputId = &quot;intent&quot;, 
+                              label = &quot;Intent:&quot;, 
+                              choices = levels(cases_new$intent), 
+                              selected = &quot;Homicide&quot;),
+                 selectInput(inputId = &quot;trendline_color&quot;, 
+                             label = &quot;Color:&quot;, 
+                             choices = colnames(cases_new)[c(5:6,8,10:11)], 
+                             selected = &quot;race&quot;),
+                 submitButton(text=&quot;View EDA&quot;)
+                 ),
+               mainPanel(
+                 h3(&quot;Trendlines&quot;),
+                 plotOutput(&quot;plot1&quot;)                               #plot output
+                 )
+               )
+             ),
+    tabPanel(&quot;Visual EDA - Discrete&quot;, fluid = TRUE,
+             sidebarLayout(
+               sidebarPanel(
+                 h3(&quot;Type of Graph&quot;),
+                 radioButtons(inputId = &quot;variable&quot;, 
+                              label = &quot;Variable:&quot;, 
+                              choices = colnames(cases_new)[c(4:6,8,10:11)], 
+                              selected = &quot;intent&quot;),
+                 selectInput(inputId = &quot;discrete_color&quot;, 
+                             label = &quot;Color:&quot;, 
+                             choices = colnames(cases_new)[c(4:6,8,10:11)], 
+                             selected = &quot;race&quot;),
+                 submitButton(text=&quot;View EDA&quot;)
+                 ),
+               mainPanel(
+                 h3(&quot;Discrete Variable&quot;),
+                 plotOutput(&quot;plot2&quot;)                                #plot output
+                 )
+               )
+             ),
+    tabPanel(&quot;Visual EDA - Continuous&quot;, fluid = TRUE,
+             sidebarLayout(
+               sidebarPanel(
+                 h3(&quot;Type of Graph&quot;),
+                 h5(&quot;Independent Variable: Age&quot;),
+                 radioButtons(inputId = &quot;plot_type&quot;, 
+                              label = &quot;Plot:&quot;, 
+                              choices = c(&quot;density plot&quot;,&quot;box plot&quot;), 
+                              selected = &quot;density plot&quot;),
+                 selectInput(inputId = &quot;continuous_color&quot;, 
+                             label = &quot;Color:&quot;, 
+                             choices = colnames(cases_new)[c(4:6,8,10:11)], 
+                             selected = &quot;race&quot;),
+                 submitButton(text=&quot;View EDA&quot;)
+                 ),
+               mainPanel(
+                 h3(&quot;Continuous Varible&quot;),
+                 plotOutput(&quot;plot3&quot;)                                 #plot output
+                 )
+               )
+             )
+    )
+  )
+
+server = function(input, output) {}
+
+shinyApp(ui, server)</code></pre>
+</div>
+<div id="step-2-define-a-server." class="section level4">
+<h4><strong>Step 2: Define a <code>server</code></strong>.</h4>
+<p>After all that is done, now on to the “easier” part. For our server, we require two basic things: a reactive source (which we would call as the <em>input</em>) and a reactive endpoint (which we would call as the <em>output</em>), to which we will attempt to connect the two of them. As an intermediary point, we would also define a reactive conductor using the <code>reactive({})</code> call in <code>shiny</code>. Based on the previous input and output defined on our UI, we will update our <code>server</code> function with the following:</p>
+<p>(For a list of <code>render*()</code> functions, check <a href="https://shiny.rstudio.com/images/shiny-cheatsheet.pdf">cheatsheet</a>.)</p>
+<pre class="r"><code>ui = fluidPage(
+  titlePanel(&quot;Gun-Related Deaths in the United States (2012-2014)&quot;),
+  tabsetPanel(
+    tabPanel(&quot;Quantitative EDA&quot;, fluid = TRUE,
+             sidebarLayout(
+               sidebarPanel(
+                 h3(&quot;Data Selection&quot;),
+                 numericInput(inputId = &quot;obs&quot;, 
+                              label = &quot;Number of Observations:&quot;, 
+                              value = 3),
+                 submitButton(text=&quot;View EDA&quot;)
+                 ),
+               mainPanel(
+                 h3(&quot;Head of the Dataset&quot;),
+                 tableOutput(&quot;view&quot;),                             
+                 h3(&quot;Dataset Summary&quot;),
+                 verbatimTextOutput(&quot;summary&quot;)                    
+                 )
+               )
+             ),
+    tabPanel(&quot;Visual EDA - Time Series&quot;, fluid = TRUE,
+             sidebarLayout(
+               sidebarPanel(
+                 h3(&quot;Type of Graph&quot;),
+                 radioButtons(inputId = &quot;intent&quot;, 
+                              label = &quot;Intent:&quot;, 
+                              choices = levels(cases_new$intent), 
+                              selected = &quot;Homicide&quot;),
+                 selectInput(inputId = &quot;trendline_color&quot;, 
+                             label = &quot;Color:&quot;, 
+                             choices = colnames(cases_new)[c(5:6,8,10:11)], 
+                             selected = &quot;race&quot;),
+                 submitButton(text=&quot;View EDA&quot;)
+                 ),
+               mainPanel(
+                 h3(&quot;Trendlines&quot;),
+                 plotOutput(&quot;plot1&quot;)                               
+                 )
+               )
+             ),
+    tabPanel(&quot;Visual EDA - Discrete&quot;, fluid = TRUE,
+             sidebarLayout(
+               sidebarPanel(
+                 h3(&quot;Type of Graph&quot;),
+                 radioButtons(inputId = &quot;variable&quot;, 
+                              label = &quot;Variable:&quot;, 
+                              choices = colnames(cases_new)[c(4:6,8,10:11)], 
+                              selected = &quot;intent&quot;),
+                 selectInput(inputId = &quot;discrete_color&quot;, 
+                             label = &quot;Color:&quot;, 
+                             choices = colnames(cases_new)[c(4:6,8,10:11)], 
+                             selected = &quot;race&quot;),
+                 submitButton(text=&quot;View EDA&quot;)
+                 ),
+               mainPanel(
+                 h3(&quot;Discrete Variable&quot;),
+                 plotOutput(&quot;plot2&quot;)                                
+                 )
+               )
+             ),
+    tabPanel(&quot;Visual EDA - Continuous&quot;, fluid = TRUE,
+             sidebarLayout(
+               sidebarPanel(
+                 h3(&quot;Type of Graph&quot;),
+                 h5(&quot;Independent Variable: Age&quot;),
+                 radioButtons(inputId = &quot;plot_type&quot;, 
+                              label = &quot;Plot:&quot;, 
+                              choices = c(&quot;density plot&quot;,&quot;box plot&quot;), 
+                              selected = &quot;density plot&quot;),
+                 selectInput(inputId = &quot;continuous_color&quot;, 
+                             label = &quot;Color:&quot;, 
+                             choices = colnames(cases_new)[c(4:6,8,10:11)], 
+                             selected = &quot;race&quot;),
+                 submitButton(text=&quot;View EDA&quot;)
+                 ),
+               mainPanel(
+                 h3(&quot;Continuous Varible&quot;),
+                 plotOutput(&quot;plot3&quot;)                                 
+                 )
+               )
+             )
+    )
+  )
+
+server = function(input, output) {
+  active_dataset_trendline= reactive({
+    if(input$intent == &quot;Homicide&quot;) {
+      count_transformation(homicide_cases, input$trendline_color)
+      } else if (input$intent == &quot;Suicide&quot;) {
+        count_transformation(suicide_cases, input$trendline_color)
+        } else if(input$intent == &quot;Accidental&quot;){
+          count_transformation(accidental_cases, input$trendline_color)
+            } else if (input$intent == &quot;Undetermined&quot;){
+              count_transformation(undetermined_cases, input$trendline_color)
+            }
+        })    #reactive conductor, i.e. transformed dataset
+  
+  active_graph= reactive({
+    if(input$plot_type == &quot;density plot&quot;) {
+      density_plot(cases_new, &quot;age&quot;, color = input$continuous_color) +
+        labs(title = paste(&quot;Deaths: age by&quot;,input$continuous_color))
+            } else if (input$plot_type == &quot;box plot&quot;) {
+                box_plot(cases_new, input$continuous_color, &quot;age&quot;, color = input$continuous_color) + 
+                theme(axis.text.x = element_text(angle = 65, hjust = 1)) +
+                labs(title = paste(&quot;Deaths: age by&quot;,input$continuous_color))
+            }
+        })    #reactive conductor, i.e. desired output for tab 4. 
+              #Note~ a reactive conductor can be called again to act as an endpoint.
+        
+  output$view = renderTable({
+    head(case_transformation(cases_new),n = input$obs)
+    })
+  output$summary = renderPrint({
+    summary(case_transformation(cases_new))
+    })        #output for tab 1
+
+  output$plot1 = renderPlot({
+    line_plot(active_dataset_trendline(), &quot;date&quot;, &quot;Total_cases&quot;, color = input$trendline_color) + 
+      labs(title = paste(&quot;Deaths:&quot;, input$intent,&quot;by&quot;,input$trendline_color),  x = &quot;Date&quot;, y = &quot;Total Cases&quot;)
+    })         #output for tab 2
+  
+  output$plot2 = renderPlot({
+    bar_plot(cases_new, input$variable, fill = input$discrete_color, dodge = TRUE) + 
+      theme(axis.text.x = element_text(angle = 65, hjust = 1)) +
+      labs(title = paste(&quot;Deaths:&quot;, input$variable,&quot;by&quot;,input$discrete_color))
+    })         #output for tab 3
+
+  output$plot3 = renderPlot({
+    active_graph()
+    })         #output for tab 4
+}
+
+shinyApp(ui, server)</code></pre>
+<p>Now, we are basically done. Our app/dashboard is finished! We now henceforth have the choice to publish our app on a <a href="https://www.shinyapps.io/">shinyapps.io</a> live server for other people to use, like I have for mine.</p>
+<p>You could also follow the same logic to give your dashboard a more crisp look by using the <a href="https://rstudio.github.io/shinydashboard/get_started.html">shinyboard</a> package from CRAN.</p>
+<hr />
+</div>
+<div id="small-perhaps-related-discussion" class="section level3">
+<h3>Small (perhaps Related) Discussion</h3>
+<p>Now, to us statisticians (or data scientists), why does this matter? Why went through such lengths to produce this type of result? When I first took a programming class with coatless, I asked myself the same question too, to realize later how important it was as I took other statistics classes.</p>
+<p>Without reservation, one rarely doubts the mental acuity of a statistician to produce meaningful work. However, in some cases, even the prolific ones aren’t the best at communicating their results, which is why having tools such as this is so important. Growing up, I used to be a big fan of Richard Feynman, the physicist known for his “eccentric” (or rather, unique) way of explaining difficult concepts in physics. I often listened to his videos while doing my math homeworks, which not only did it supply me with the motivation, but also imparted a philosophy within me that (truthfully) not many people have—that is, to explain with clarity and brevity so much so even the most distant layman could understand. And that that sometimes requires intellectual humility and empathy to put our ourselves in others’ shoes.</p>
+<p>So, communicate with intent.</p>
+</div>
+
+    </div>
+
+    
+
+
+<div class="article-tags">
+  
+  <a class="badge badge-light" href="/tags/shiny/">Shiny</a>
+  
+</div>
+
+
+
+    
+
+
+
+
+
+
+<div class="media author-card" itemscope itemtype="http://schema.org/Person">
+  
+  <img class="portrait mr-3" src="/img/portrait.jpg" itemprop="image" alt="Avatar">
+  
+  <div class="media-body">
+    <h5 class="card-title" itemprop="name"><a href="/">Hassan Rahim Kamil</a></h5>
+    <h6 class="card-subtitle">Teaching Assistant</h6>
+    
+    <ul class="network-icon" aria-hidden="true">
+      
+      
+      
+      
+        
+      
+      
+      
+      
+      
+        
+      
+      <li>
+        <a itemprop="sameAs" href="/#contact" >
+          <i class="fas fa-envelope"></i>
+        </a>
+      </li>
+      
+      
+      
+      
+        
+      
+      
+      
+      
+      
+        
+      
+      <li>
+        <a itemprop="sameAs" href="https://twitter.com/HassanNasru" target="_blank" rel="noopener">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+      
+      
+      
+      
+        
+      
+      
+      
+      
+      
+        
+      
+      <li>
+        <a itemprop="sameAs" href="https://www.kaggle.com/hassanrk" target="_blank" rel="noopener">
+          <i class="fab fa-kaggle"></i>
+        </a>
+      </li>
+      
+      
+      
+      
+        
+      
+      
+      
+      
+      
+        
+      
+      <li>
+        <a itemprop="sameAs" href="https://stackexchange.com/users/8636946/hassan-rahim-kamil?tab=accounts" target="_blank" rel="noopener">
+          <i class="fab fa-stack-exchange"></i>
+        </a>
+      </li>
+      
+      
+      
+      
+        
+      
+      
+      
+      
+      
+        
+      
+      <li>
+        <a itemprop="sameAs" href="https://github.com/hassanrk" target="_blank" rel="noopener">
+          <i class="fab fa-github"></i>
+        </a>
+      </li>
+      
+      
+      
+      
+        
+      
+      
+      
+      
+      
+        
+      
+      <li>
+        <a itemprop="sameAs" href="https://www.linkedin.com/in/hassan-rahim-kamil-a7a17697/" target="_blank" rel="noopener">
+          <i class="fab fa-linkedin"></i>
+        </a>
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+
+
+
+    
+    
+
+    
+
+    
+
+
+  </div>
+</article>
+
+<div class="container">
+  <footer class="site-footer">
+  
+  <p class="powered-by">
+    <a href="/privacy/">Privacy Policy</a>
+  </p>
+  
+
+  <p class="powered-by">
+    &copy; 2018 &middot; 
+
+    Powered by the
+    <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
+    <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+    
+    <span class="float-right" aria-hidden="true">
+      <a href="#" id="back_to_top">
+        <span class="button_icon">
+          <i class="fas fa-chevron-up fa-2x"></i>
+        </span>
+      </a>
+    </span>
+    
+  </p>
+</footer>
+
+</div>
+
+
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cite</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <pre><code class="tex hljs"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-primary my-1 js-copy-cite" href="#" target="_blank">
+          <i class="fas fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-outline-primary my-1 js-download-cite" href="#" target="_blank">
+          <i class="fas fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+    
+    
+    <script src="/js/mathjax-config.js"></script>
+    
+
+    
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha512-+NqPlbbtM1QqiK8ZAo4Yrj2c4lNQoGv8P79DPtKzj++l5jnN39rHA/xsqn8zE9l0uSoxaCdrOgFs6yjyfbBxSg==" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.3/imagesloaded.pkgd.min.js" integrity="sha512-umsR78NN0D23AzgoZ11K7raBD+R6hqKojyBZs1w8WvYlsI+QuKRGBx3LFCwhatzBunCjDuJpDHwxD13sLMbpRA==" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha256-VsEqElsCHSGmnmHXGQzvoWjWwoznFSZc6hs7ARLRacQ=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.4/isotope.pkgd.min.js" integrity="sha512-VDBOIlDbuC4VWxGJNmuFRQ0Li0SKkDpmGyuhAG5LTDLd/dJ/S0WMVxriR2Y+CyPL5gzjpN4f/6iqWVBJlht0tQ==" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" integrity="sha256-X5PoE3KU5l+JcX+w09p/wHl9AzK333C4hJ2I9S5mD4M=" crossorigin="anonymous"></script>
+
+      
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js" integrity="sha256-/BfiIkHlHoVihZdc6TFuj7MmJ0TWcWsMXkeDFwhi0zw=" crossorigin="anonymous"></script>
+        
+      
+
+      
+      
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_CHTML-full" integrity="sha256-GhM+5JHb6QUzOQPXSJLEWP7R73CbkisjzK5Eyij4U9w=" crossorigin="anonymous" async></script>
+      
+    
+
+    
+    
+
+    
+    
+    
+
+    
+    
+    <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    
+    
+    <script>
+      const search_index_filename = "/index.json";
+      const i18n = {
+        'placeholder': "Search...",
+        'results': "results found",
+        'no_results': "No results found"
+      };
+      const content_type = {
+        'post': "Posts",
+        'project': "Projects",
+        'publication' : "Publications",
+        'talk' : "Talks"
+        };
+    </script>
+    
+
+    
+    
+
+    
+    
+    <script id="search-hit-fuse-template" type="text/x-template">
+      <div class="search-hit" id="summary-{{key}}">
+      <div class="search-hit-content">
+        <div class="search-hit-name">
+          <a href="{{relpermalink}}">{{title}}</a>
+          <div class="article-metadata search-hit-type">{{type}}</div>
+          <p class="search-hit-description">{{snippet}}</p>
+        </div>
+      </div>
+      </div>
+    </script>
+    
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.2.1/fuse.min.js" integrity="sha256-VzgmKYmhsGNNN4Ph1kMW+BjoYJM2jV5i4IlFoeZA9XI=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
+    
+
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    <script src="/js/academic.min.70f0041f5a24c6a675ac218c98d7ef71.js"></script>
+
+    
+
+  </body>
+</html>
+

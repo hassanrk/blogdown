@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Projects on Hassan Rahim Kamil</title>
+    <link>/project/</link>
+    <description>Recent content in Projects on Hassan Rahim Kamil</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>&amp;copy; 2018</copyright>
+    <lastBuildDate>Sun, 06 Jan 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/project/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Sentiment Analysis on Political Tweets and Predicting Google Trends Search Queries</title>
+      <link>/project/2016-election-ml/sentiment-analysis-on-political-tweets-and-predicting-google-trends-search-queries/</link>
+      <pubDate>Sun, 06 Jan 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/project/2016-election-ml/sentiment-analysis-on-political-tweets-and-predicting-google-trends-search-queries/</guid>
+      <description>Microblogging is becoming more and more ubiquitous among today’s generation. In fact, interactions on some type of online platform or service such as Facebook, Twitter or Google leave traces of data that show a record of behavior or actions. As Davidowitz put it in his book Everybody Lies: “The everyday act of typing a word or phrase into a compact, rectangular white box leaves a small trace of truth that, when multiplied by millions, eventually reveals profound realities.</description>
+    </item>
+    
+  </channel>
+</rss>

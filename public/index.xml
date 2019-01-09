@@ -1,0 +1,1584 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Hassan Rahim Kamil on Hassan Rahim Kamil</title>
+    <link>/</link>
+    <description>Recent content in Hassan Rahim Kamil on Hassan Rahim Kamil</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>&amp;copy; 2018</copyright>
+    <lastBuildDate>Sun, 15 Oct 2017 00:00:00 -0500</lastBuildDate>
+    <atom:link href="/" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Getting Interactive with Shiny</title>
+      <link>/post/getting-interactive-with-shiny/getting-interactive-with-shiny/</link>
+      <pubDate>Mon, 07 Jan 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/post/getting-interactive-with-shiny/getting-interactive-with-shiny/</guid>
+      <description>
+
+
+&lt;p&gt;&lt;img src=&#34;/post/getting-interactive-with-shiny/index_files/figure-html/density%20plot-1.gif&#34; /&gt;&lt;!-- --&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;The greatest value of a picture is when it forces us to notice what we never expected to see.&lt;/p&gt;
+&lt;p&gt;— &lt;strong&gt;John Tukey&lt;/strong&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;I remember taking a class with &lt;a href=&#34;https://thecoatlessprofessor.com/&#34;&gt;coatless&lt;/a&gt; while I was still in my third year of undergraduate, completely devoid of any programming language. He struck upon me as a teacher who was &lt;em&gt;ridiculously&lt;/em&gt; enthusiastic about R, though was passionate and careful in explaining the fundamental concepts to his students. In one of his lessons, he talked about an app called &lt;a href=&#34;https://shiny.rstudio.com/&#34;&gt;Shiny&lt;/a&gt; that provides an interactive &lt;strong&gt;Live&lt;/strong&gt; interface with the user. Sounds cool? Well, it is. More so, it is one of the things in programming that forces interactivity between a human and a computer. Just think about the endless possibility!&lt;/p&gt;
+&lt;p&gt;Here is a Shiny app that uses &lt;a href=&#34;https://yihui.shinyapps.io/voice/&#34;&gt;voice recognition&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Shiny builds on the idea that one can build interactive web apps straight from R. It has two main components, a user interface (UI) and a server. A server is typically defined as the &lt;em&gt;backend&lt;/em&gt; of data retrieval and functionality that perform all the transformations, while the UI serves as the &lt;em&gt;frontend&lt;/em&gt; or &lt;em&gt;client-side&lt;/em&gt; where a user interacts accordingly given a set of inputs, sort of like how the customer service/service provider works.&lt;/p&gt;
+&lt;p&gt;As an activity, I was told to visualize data on a Shiny app and interpret the results. I carefully picked a topic and decided to do a project about gun-related deaths in the United States. I gathered a dataset from &lt;a href=&#34;https://github.com/fivethirtyeight/guns-data/blob/master/full_data.csv&#34;&gt;FiveThirtyEight&lt;/a&gt; that has data collected by the &lt;a href=&#34;https://www.cdc.gov/&#34;&gt;Centers for Disease Control and Prevention (CDC)&lt;/a&gt; on gun-related deaths from the year 2012 to 2014. Fast forward the data wrangling, we are ready to build a Shiny app.&lt;/p&gt;
+&lt;p&gt;Let’s start by building the UI template for our Shiny app. (&lt;a href=&#34;#shiny_app&#34;&gt;final product&lt;/a&gt;)&lt;/p&gt;
+&lt;div id=&#34;section-step-1-define-a-ui.&#34; class=&#34;section level4&#34;&gt;
+&lt;h4&gt;&lt;strong&gt;Step 1: Define a &lt;code&gt;UI&lt;/code&gt;&lt;/strong&gt;.&lt;/h4&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(shiny)
+
+ui = shinyUI(
+  fluidPage(
+    titlePanel(&amp;quot;Gun-Related Deaths in the United States (2012-2014)&amp;quot;), #Title
+    sidebarLayout(
+      sidebarPanel(
+        h1(&amp;quot;This is my input&amp;quot;)
+      ),
+      mainPanel(&amp;quot;This is my output&amp;quot;)
+    ) # close: sidebarLayout()
+  ) # close: fluidPage()
+) # close: shinyUI()
+
+server = function(input, output){}
+
+shinyApp(ui, server)&lt;/code&gt;&lt;/pre&gt;
+&lt;div class=&#34;figure&#34;&gt;
+&lt;img src=&#34;/post/getting-interactive-with-shiny/index_files/ui%201.png&#34; /&gt;
+
+&lt;/div&gt;
+&lt;p&gt;This is the raw backbone behind our Shiny app. For our app, we want to make four different types of visualization, so ideally we would want four different tabs. To achieve that, we would use &lt;code&gt;tabsetPanel()&lt;/code&gt; and within it, four &lt;code&gt;tabPanel()&lt;/code&gt;’s, in which we would include the same structure as we did previously. I shortened “Explanatory Data Analysis” to just EDA.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(shiny)
+
+ui = fluidPage(
+  titlePanel(&amp;quot;Gun-Related Deaths in the United States (2012-2014)&amp;quot;),
+  tabsetPanel(
+    tabPanel(&amp;quot;Quantitative EDA&amp;quot;, fluid = TRUE,           #tab 1
+             sidebarLayout(
+               sidebarPanel(
+                 h3(&amp;quot;Data Selection&amp;quot;)
+                 ),
+               mainPanel(
+                 h3(&amp;quot;Head of the Dataset&amp;quot;),
+                 h3(&amp;quot;Dataset Summary&amp;quot;)
+                 )
+               )
+             ),
+    tabPanel(&amp;quot;Visual EDA - Time Series&amp;quot;, fluid = TRUE,   #tab 2
+             sidebarLayout(
+               sidebarPanel(
+                 h3(&amp;quot;Type of Graph&amp;quot;)
+                 ),
+               mainPanel(
+                 h3(&amp;quot;Trendlines&amp;quot;)
+                 )
+               )
+             ),
+    tabPanel(&amp;quot;Visual EDA - Discrete&amp;quot;, fluid = TRUE,      #tab 3
+             sidebarLayout(
+               sidebarPanel(
+                 h3(&amp;quot;Type of Graph&amp;quot;)
+                 ),
+               mainPanel(
+                 h3(&amp;quot;Discrete Variable&amp;quot;)
+                 )
+               )
+             ),
+    tabPanel(&amp;quot;Visual EDA - Continuous&amp;quot;, fluid = TRUE,    #tab 4
+             sidebarLayout(
+               sidebarPanel(
+                 h3(&amp;quot;Type of Graph&amp;quot;)
+                 ),
+               mainPanel(
+                 h3(&amp;quot;Continuous Varible&amp;quot;)
+                 )
+               )
+             )
+    )
+  )
+    
+server = function(input, output) {}
+
+shinyApp(ui, server)&lt;/code&gt;&lt;/pre&gt;
+&lt;div class=&#34;figure&#34;&gt;
+&lt;img src=&#34;/post/getting-interactive-with-shiny/index_files/ui%202.png&#34; /&gt;
+
+&lt;/div&gt;
+&lt;p&gt;Next, we would want to define control widgets to feed our active inputs. To that end, we would want to use &lt;code&gt;numericInput()&lt;/code&gt;, &lt;code&gt;selectInput()&lt;/code&gt; and &lt;code&gt;radioButtons()&lt;/code&gt;. A list of other control widgets can be found on the &lt;a href=&#34;https://shiny.rstudio.com/images/shiny-cheatsheet.pdf&#34;&gt;Shiny cheatsheet&lt;/a&gt;. We would also want to add &lt;code&gt;submitButton()&lt;/code&gt; to prevent reaction on the entire app.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ui = fluidPage(
+  titlePanel(&amp;quot;Gun-Related Deaths in the United States (2012-2014)&amp;quot;),
+  tabsetPanel(
+    tabPanel(&amp;quot;Quantitative EDA&amp;quot;, fluid = TRUE,
+             sidebarLayout(
+               sidebarPanel(
+                 h3(&amp;quot;Data Selection&amp;quot;),
+                 numericInput(inputId = &amp;quot;obs&amp;quot;, 
+                              label = &amp;quot;Number of Observations:&amp;quot;, 
+                              value = 3),                                   #numeric input
+                 submitButton(text=&amp;quot;View EDA&amp;quot;)                              #submit button
+                 ),
+               mainPanel(
+                 h3(&amp;quot;Head of the Dataset&amp;quot;),
+                 h3(&amp;quot;Dataset Summary&amp;quot;)
+                 )
+               )
+             ),
+    tabPanel(&amp;quot;Visual EDA - Time Series&amp;quot;, fluid = TRUE,
+             sidebarLayout(
+               sidebarPanel(
+                 h3(&amp;quot;Type of Graph&amp;quot;),
+                 radioButtons(inputId = &amp;quot;intent&amp;quot;, 
+                              label = &amp;quot;Intent:&amp;quot;, 
+                              choices = levels(cases_new$intent), 
+                              selected = &amp;quot;Homicide&amp;quot;),                        #checkbox
+                 selectInput(inputId = &amp;quot;trendline_color&amp;quot;, 
+                             label = &amp;quot;Color:&amp;quot;, 
+                             choices = colnames(cases_new)[c(5:6,8,10:11)], 
+                             selected = &amp;quot;race&amp;quot;),                             #dropdown
+                 submitButton(text=&amp;quot;View EDA&amp;quot;)                               #submit button
+                 ),
+               mainPanel(
+                 h3(&amp;quot;Trendlines&amp;quot;)
+                 )
+               )
+             ),
+    tabPanel(&amp;quot;Visual EDA - Discrete&amp;quot;, fluid = TRUE,
+             sidebarLayout(
+               sidebarPanel(
+                 h3(&amp;quot;Type of Graph&amp;quot;),
+                 radioButtons(inputId = &amp;quot;variable&amp;quot;, 
+                              label = &amp;quot;Variable:&amp;quot;, 
+                              choices = colnames(cases_new)[c(4:6,8,10:11)], 
+                              selected = &amp;quot;intent&amp;quot;),                           #checkbox
+                 selectInput(inputId = &amp;quot;discrete_color&amp;quot;, 
+                             label = &amp;quot;Color:&amp;quot;, 
+                             choices = colnames(cases_new)[c(4:6,8,10:11)], 
+                             selected = &amp;quot;race&amp;quot;),                              #dropdown
+                 submitButton(text=&amp;quot;View EDA&amp;quot;)                                #submit button
+                 ),
+               mainPanel(
+                 h3(&amp;quot;Discrete Variable&amp;quot;)
+                 )
+               )
+             ),
+    tabPanel(&amp;quot;Visual EDA - Continuous&amp;quot;, fluid = TRUE,
+             sidebarLayout(
+               sidebarPanel(
+                 h3(&amp;quot;Type of Graph&amp;quot;),
+                 h5(&amp;quot;Independent Variable: Age&amp;quot;),
+                 radioButtons(inputId = &amp;quot;plot_type&amp;quot;, 
+                              label = &amp;quot;Plot:&amp;quot;, 
+                              choices = c(&amp;quot;density plot&amp;quot;,&amp;quot;box plot&amp;quot;), 
+                              selected = &amp;quot;density plot&amp;quot;),                     #checkbox
+                 selectInput(inputId = &amp;quot;continuous_color&amp;quot;, 
+                             label = &amp;quot;Color:&amp;quot;, 
+                             choices = colnames(cases_new)[c(4:6,8,10:11)], 
+                             selected = &amp;quot;race&amp;quot;),                              #dropdown
+                 submitButton(text=&amp;quot;View EDA&amp;quot;)                                #submit button
+                 ),
+               mainPanel(
+                 h3(&amp;quot;Continuous Varible&amp;quot;)
+                 )
+               )
+             )
+    )
+  )
+
+server = function(input, output) {}
+
+shinyApp(ui, server)&lt;/code&gt;&lt;/pre&gt;
+&lt;div class=&#34;figure&#34;&gt;
+&lt;img src=&#34;/post/getting-interactive-with-shiny/index_files/ui%203.png&#34; /&gt;
+
+&lt;/div&gt;
+&lt;p&gt;The &lt;code&gt;inputID&lt;/code&gt; argument in each widget function will be used to call out our inputs when we feed them into the server.&lt;/p&gt;
+&lt;p&gt;Then, we would want to define the types of output within each &lt;code&gt;mainPanel()&lt;/code&gt; that we would want to show on the UI. The output on the UI will work hand-in-hand with the &lt;code&gt;render*()&lt;/code&gt; functions in the server. Again, for a list of them, check the &lt;a href=&#34;https://shiny.rstudio.com/images/shiny-cheatsheet.pdf&#34;&gt;cheatsheet&lt;/a&gt;.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ui = fluidPage(
+  titlePanel(&amp;quot;Gun-Related Deaths in the United States (2012-2014)&amp;quot;),
+  tabsetPanel(
+    tabPanel(&amp;quot;Quantitative EDA&amp;quot;, fluid = TRUE,
+             sidebarLayout(
+               sidebarPanel(
+                 h3(&amp;quot;Data Selection&amp;quot;),
+                 numericInput(inputId = &amp;quot;obs&amp;quot;, 
+                              label = &amp;quot;Number of Observations:&amp;quot;, 
+                              value = 3),
+                 submitButton(text=&amp;quot;View EDA&amp;quot;)
+                 ),
+               mainPanel(
+                 h3(&amp;quot;Head of the Dataset&amp;quot;),
+                 tableOutput(&amp;quot;view&amp;quot;),                             #table output
+                 h3(&amp;quot;Dataset Summary&amp;quot;),
+                 verbatimTextOutput(&amp;quot;summary&amp;quot;)                    #text output
+                 )
+               )
+             ),
+    tabPanel(&amp;quot;Visual EDA - Time Series&amp;quot;, fluid = TRUE,
+             sidebarLayout(
+               sidebarPanel(
+                 h3(&amp;quot;Type of Graph&amp;quot;),
+                 radioButtons(inputId = &amp;quot;intent&amp;quot;, 
+                              label = &amp;quot;Intent:&amp;quot;, 
+                              choices = levels(cases_new$intent), 
+                              selected = &amp;quot;Homicide&amp;quot;),
+                 selectInput(inputId = &amp;quot;trendline_color&amp;quot;, 
+                             label = &amp;quot;Color:&amp;quot;, 
+                             choices = colnames(cases_new)[c(5:6,8,10:11)], 
+                             selected = &amp;quot;race&amp;quot;),
+                 submitButton(text=&amp;quot;View EDA&amp;quot;)
+                 ),
+               mainPanel(
+                 h3(&amp;quot;Trendlines&amp;quot;),
+                 plotOutput(&amp;quot;plot1&amp;quot;)                               #plot output
+                 )
+               )
+             ),
+    tabPanel(&amp;quot;Visual EDA - Discrete&amp;quot;, fluid = TRUE,
+             sidebarLayout(
+               sidebarPanel(
+                 h3(&amp;quot;Type of Graph&amp;quot;),
+                 radioButtons(inputId = &amp;quot;variable&amp;quot;, 
+                              label = &amp;quot;Variable:&amp;quot;, 
+                              choices = colnames(cases_new)[c(4:6,8,10:11)], 
+                              selected = &amp;quot;intent&amp;quot;),
+                 selectInput(inputId = &amp;quot;discrete_color&amp;quot;, 
+                             label = &amp;quot;Color:&amp;quot;, 
+                             choices = colnames(cases_new)[c(4:6,8,10:11)], 
+                             selected = &amp;quot;race&amp;quot;),
+                 submitButton(text=&amp;quot;View EDA&amp;quot;)
+                 ),
+               mainPanel(
+                 h3(&amp;quot;Discrete Variable&amp;quot;),
+                 plotOutput(&amp;quot;plot2&amp;quot;)                                #plot output
+                 )
+               )
+             ),
+    tabPanel(&amp;quot;Visual EDA - Continuous&amp;quot;, fluid = TRUE,
+             sidebarLayout(
+               sidebarPanel(
+                 h3(&amp;quot;Type of Graph&amp;quot;),
+                 h5(&amp;quot;Independent Variable: Age&amp;quot;),
+                 radioButtons(inputId = &amp;quot;plot_type&amp;quot;, 
+                              label = &amp;quot;Plot:&amp;quot;, 
+                              choices = c(&amp;quot;density plot&amp;quot;,&amp;quot;box plot&amp;quot;), 
+                              selected = &amp;quot;density plot&amp;quot;),
+                 selectInput(inputId = &amp;quot;continuous_color&amp;quot;, 
+                             label = &amp;quot;Color:&amp;quot;, 
+                             choices = colnames(cases_new)[c(4:6,8,10:11)], 
+                             selected = &amp;quot;race&amp;quot;),
+                 submitButton(text=&amp;quot;View EDA&amp;quot;)
+                 ),
+               mainPanel(
+                 h3(&amp;quot;Continuous Varible&amp;quot;),
+                 plotOutput(&amp;quot;plot3&amp;quot;)                                 #plot output
+                 )
+               )
+             )
+    )
+  )
+
+server = function(input, output) {}
+
+shinyApp(ui, server)&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;section-step-2-define-a-server.&#34; class=&#34;section level4&#34;&gt;
+&lt;h4&gt;&lt;strong&gt;Step 2: Define a &lt;code&gt;server&lt;/code&gt;&lt;/strong&gt;.&lt;/h4&gt;
+&lt;p&gt;After all that is done, now on to the “easier” part. For our server, we require two basic things: a reactive source (which we would call as the &lt;em&gt;input&lt;/em&gt;) and a reactive endpoint (which we would call as the &lt;em&gt;output&lt;/em&gt;), to which we will attempt to connect the two of them. As an intermediary point, we would also define a reactive conductor using the &lt;code&gt;reactive({})&lt;/code&gt; call in &lt;code&gt;shiny&lt;/code&gt;. Based on the previous input and output defined on our UI, we will update our &lt;code&gt;server&lt;/code&gt; function with the following:&lt;/p&gt;
+&lt;p&gt;(For a list of &lt;code&gt;render*()&lt;/code&gt; functions, check &lt;a href=&#34;https://shiny.rstudio.com/images/shiny-cheatsheet.pdf&#34;&gt;cheatsheet&lt;/a&gt;.)&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ui = fluidPage(
+  titlePanel(&amp;quot;Gun-Related Deaths in the United States (2012-2014)&amp;quot;),
+  tabsetPanel(
+    tabPanel(&amp;quot;Quantitative EDA&amp;quot;, fluid = TRUE,
+             sidebarLayout(
+               sidebarPanel(
+                 h3(&amp;quot;Data Selection&amp;quot;),
+                 numericInput(inputId = &amp;quot;obs&amp;quot;, 
+                              label = &amp;quot;Number of Observations:&amp;quot;, 
+                              value = 3),
+                 submitButton(text=&amp;quot;View EDA&amp;quot;)
+                 ),
+               mainPanel(
+                 h3(&amp;quot;Head of the Dataset&amp;quot;),
+                 tableOutput(&amp;quot;view&amp;quot;),                             
+                 h3(&amp;quot;Dataset Summary&amp;quot;),
+                 verbatimTextOutput(&amp;quot;summary&amp;quot;)                    
+                 )
+               )
+             ),
+    tabPanel(&amp;quot;Visual EDA - Time Series&amp;quot;, fluid = TRUE,
+             sidebarLayout(
+               sidebarPanel(
+                 h3(&amp;quot;Type of Graph&amp;quot;),
+                 radioButtons(inputId = &amp;quot;intent&amp;quot;, 
+                              label = &amp;quot;Intent:&amp;quot;, 
+                              choices = levels(cases_new$intent), 
+                              selected = &amp;quot;Homicide&amp;quot;),
+                 selectInput(inputId = &amp;quot;trendline_color&amp;quot;, 
+                             label = &amp;quot;Color:&amp;quot;, 
+                             choices = colnames(cases_new)[c(5:6,8,10:11)], 
+                             selected = &amp;quot;race&amp;quot;),
+                 submitButton(text=&amp;quot;View EDA&amp;quot;)
+                 ),
+               mainPanel(
+                 h3(&amp;quot;Trendlines&amp;quot;),
+                 plotOutput(&amp;quot;plot1&amp;quot;)                               
+                 )
+               )
+             ),
+    tabPanel(&amp;quot;Visual EDA - Discrete&amp;quot;, fluid = TRUE,
+             sidebarLayout(
+               sidebarPanel(
+                 h3(&amp;quot;Type of Graph&amp;quot;),
+                 radioButtons(inputId = &amp;quot;variable&amp;quot;, 
+                              label = &amp;quot;Variable:&amp;quot;, 
+                              choices = colnames(cases_new)[c(4:6,8,10:11)], 
+                              selected = &amp;quot;intent&amp;quot;),
+                 selectInput(inputId = &amp;quot;discrete_color&amp;quot;, 
+                             label = &amp;quot;Color:&amp;quot;, 
+                             choices = colnames(cases_new)[c(4:6,8,10:11)], 
+                             selected = &amp;quot;race&amp;quot;),
+                 submitButton(text=&amp;quot;View EDA&amp;quot;)
+                 ),
+               mainPanel(
+                 h3(&amp;quot;Discrete Variable&amp;quot;),
+                 plotOutput(&amp;quot;plot2&amp;quot;)                                
+                 )
+               )
+             ),
+    tabPanel(&amp;quot;Visual EDA - Continuous&amp;quot;, fluid = TRUE,
+             sidebarLayout(
+               sidebarPanel(
+                 h3(&amp;quot;Type of Graph&amp;quot;),
+                 h5(&amp;quot;Independent Variable: Age&amp;quot;),
+                 radioButtons(inputId = &amp;quot;plot_type&amp;quot;, 
+                              label = &amp;quot;Plot:&amp;quot;, 
+                              choices = c(&amp;quot;density plot&amp;quot;,&amp;quot;box plot&amp;quot;), 
+                              selected = &amp;quot;density plot&amp;quot;),
+                 selectInput(inputId = &amp;quot;continuous_color&amp;quot;, 
+                             label = &amp;quot;Color:&amp;quot;, 
+                             choices = colnames(cases_new)[c(4:6,8,10:11)], 
+                             selected = &amp;quot;race&amp;quot;),
+                 submitButton(text=&amp;quot;View EDA&amp;quot;)
+                 ),
+               mainPanel(
+                 h3(&amp;quot;Continuous Varible&amp;quot;),
+                 plotOutput(&amp;quot;plot3&amp;quot;)                                 
+                 )
+               )
+             )
+    )
+  )
+
+server = function(input, output) {
+  active_dataset_trendline= reactive({
+    if(input$intent == &amp;quot;Homicide&amp;quot;) {
+      count_transformation(homicide_cases, input$trendline_color)
+      } else if (input$intent == &amp;quot;Suicide&amp;quot;) {
+        count_transformation(suicide_cases, input$trendline_color)
+        } else if(input$intent == &amp;quot;Accidental&amp;quot;){
+          count_transformation(accidental_cases, input$trendline_color)
+            } else if (input$intent == &amp;quot;Undetermined&amp;quot;){
+              count_transformation(undetermined_cases, input$trendline_color)
+            }
+        })    #reactive conductor, i.e. transformed dataset
+  
+  active_graph= reactive({
+    if(input$plot_type == &amp;quot;density plot&amp;quot;) {
+      density_plot(cases_new, &amp;quot;age&amp;quot;, color = input$continuous_color) +
+        labs(title = paste(&amp;quot;Deaths: age by&amp;quot;,input$continuous_color))
+            } else if (input$plot_type == &amp;quot;box plot&amp;quot;) {
+                box_plot(cases_new, input$continuous_color, &amp;quot;age&amp;quot;, color = input$continuous_color) + 
+                theme(axis.text.x = element_text(angle = 65, hjust = 1)) +
+                labs(title = paste(&amp;quot;Deaths: age by&amp;quot;,input$continuous_color))
+            }
+        })    #reactive conductor, i.e. desired output for tab 4. 
+              #Note~ a reactive conductor can be called again to act as an endpoint.
+        
+  output$view = renderTable({
+    head(case_transformation(cases_new),n = input$obs)
+    })
+  output$summary = renderPrint({
+    summary(case_transformation(cases_new))
+    })        #output for tab 1
+
+  output$plot1 = renderPlot({
+    line_plot(active_dataset_trendline(), &amp;quot;date&amp;quot;, &amp;quot;Total_cases&amp;quot;, color = input$trendline_color) + 
+      labs(title = paste(&amp;quot;Deaths:&amp;quot;, input$intent,&amp;quot;by&amp;quot;,input$trendline_color),  x = &amp;quot;Date&amp;quot;, y = &amp;quot;Total Cases&amp;quot;)
+    })         #output for tab 2
+  
+  output$plot2 = renderPlot({
+    bar_plot(cases_new, input$variable, fill = input$discrete_color, dodge = TRUE) + 
+      theme(axis.text.x = element_text(angle = 65, hjust = 1)) +
+      labs(title = paste(&amp;quot;Deaths:&amp;quot;, input$variable,&amp;quot;by&amp;quot;,input$discrete_color))
+    })         #output for tab 3
+
+  output$plot3 = renderPlot({
+    active_graph()
+    })         #output for tab 4
+}
+
+shinyApp(ui, server)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now, we are basically done. Our app/dashboard is finished! We now henceforth have the choice to publish our app on a &lt;a href=&#34;https://www.shinyapps.io/&#34;&gt;shinyapps.io&lt;/a&gt; live server for other people to use, like I have for mine.&lt;/p&gt;
+&lt;p&gt;&lt;a id=&#34;shiny_app&#34;&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;The Final Product &lt;a href=&#34;https://hassan-rk.shinyapps.io/gun_deaths/&#34;&gt;link to app&lt;/a&gt;:&lt;/strong&gt;&lt;/p&gt;
+&lt;iframe width=&#34;500&#34; height=&#34;450&#34; scrolling=&#34;yes&#34; frameborder=&#34;yes&#34; src=&#34;https://hassan-rk.shinyapps.io/gun_deaths/&#34;&gt;
+&lt;/iframe&gt;
+&lt;p&gt;You could also follow the same logic to give your dashboard a more crisp look by downloading the themes from the &lt;a href=&#34;https://rstudio.github.io/shinydashboard/get_started.html&#34;&gt;shinydashboard&lt;/a&gt; package available on CRAN.&lt;/p&gt;
+&lt;hr /&gt;
+&lt;/div&gt;
+&lt;div id=&#34;section-small-perhaps-related-discussion&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Small (perhaps Related) Discussion&lt;/h3&gt;
+&lt;p&gt;Now, to us statisticians (or data scientists), why does this matter? Why went through such lengths to produce this type of result? When I first took a programming class with coatless, I asked myself the same question too, to realize later how important it was as I took other statistics classes.&lt;/p&gt;
+&lt;p&gt;Without reservation, one rarely doubts the mental acuity of a statistician to produce meaningful work. However, in some cases, even the prolific ones aren’t the best at communicating their results, which is why having tools such as this is so important. Growing up, I used to be a big fan of Richard Feynman, the physicist known for his “eccentric” (or rather, unique) way of explaining difficult concepts in physics. I often listened to his videos while doing my math homeworks, which not only did it supply me with the motivation, but also imparted a philosophy within me that (truthfully) not many people have—that is, to explain with clarity and brevity so much so even the most distant layman could understand. And that that sometimes requires intellectual humility and empathy to put our ourselves in others’ shoes.&lt;/p&gt;
+&lt;p&gt;So, communicate with the intent to be understood.&lt;/p&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Sentiment Analysis on Political Tweets and Predicting Google Trends Search Queries</title>
+      <link>/project/2016-election-ml/sentiment-analysis-on-political-tweets-and-predicting-google-trends-search-queries/</link>
+      <pubDate>Sun, 06 Jan 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/project/2016-election-ml/sentiment-analysis-on-political-tweets-and-predicting-google-trends-search-queries/</guid>
+      <description>
+
+
+&lt;p&gt;Microblogging is becoming more and more ubiquitous among today’s generation. In fact, interactions on some type of online platform or service such as Facebook, Twitter or Google leave traces of data that show a record of behavior or actions. As Davidowitz put it in his book &lt;em&gt;Everybody Lies&lt;/em&gt;: “The everyday act of typing a word or phrase into a compact, rectangular white box leaves a small trace of truth that, when multiplied by millions, eventually reveals profound realities.” To statisticians, this quote faintly reminds of the many statistical ideas that could be put to the test.&lt;/p&gt;
+&lt;p&gt;An emerging role of online platforms has been in the political context. As such, our research interest would be to predict political outcomes with a preferred dataset that is in line with our hypothesis and allows us to scientifically control for many variables.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Hypothesis: We could use sentiments on social media to predict public opinions as a proxy for political outcomes.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;The scope of the preferred dataset(s) that we are looking into include observations&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;whose geolocations match those of the political outcomes of interest.&lt;/li&gt;
+&lt;li&gt;represent the voter base. And;&lt;/li&gt;
+&lt;li&gt;are longitudinal.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;To that end, we gathered the following dataset from &lt;a href=&#34;https://www.kaggle.com/benhamner/clinton-trump-tweets&#34;&gt;Kaggle&lt;/a&gt;:&lt;/p&gt;
+&lt;div id=&#34;hillary-clinton-and-donald-trump-tweets&#34; class=&#34;section level4&#34;&gt;
+&lt;h4&gt;&lt;strong&gt;Hillary Clinton and Donald Trump Tweets&lt;/strong&gt;&lt;/h4&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr class=&#34;header&#34;&gt;
+&lt;th&gt;Features&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td&gt;handle&lt;/td&gt;
+&lt;td&gt;Twitter handle name&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td&gt;text&lt;/td&gt;
+&lt;td&gt;Tweets&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td&gt;is_retweet&lt;/td&gt;
+&lt;td&gt;Whether the tweet was retweeted&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td&gt;original_author&lt;/td&gt;
+&lt;td&gt;Original author&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td&gt;time&lt;/td&gt;
+&lt;td&gt;Timestamp&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td&gt;in_reply_to_screen_name&lt;/td&gt;
+&lt;td&gt;-&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td&gt;in_reply_to_status_id&lt;/td&gt;
+&lt;td&gt;-&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td&gt;in_reply_to_user_id&lt;/td&gt;
+&lt;td&gt;-&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td&gt;is_quote_status&lt;/td&gt;
+&lt;td&gt;Whether the tweet was quoted&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td&gt;lang&lt;/td&gt;
+&lt;td&gt;Twitter’s guess at language&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td&gt;retweet_count&lt;/td&gt;
+&lt;td&gt;Retweet count&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td&gt;favorite_count&lt;/td&gt;
+&lt;td&gt;Favorite count&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td&gt;longitude&lt;/td&gt;
+&lt;td&gt;Longitude&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td&gt;latitude&lt;/td&gt;
+&lt;td&gt;Latitude&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td&gt;place_id&lt;/td&gt;
+&lt;td&gt;Place id&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td&gt;place_full_name&lt;/td&gt;
+&lt;td&gt;Place full name&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td&gt;place_name&lt;/td&gt;
+&lt;td&gt;Place name&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td&gt;place_type&lt;/td&gt;
+&lt;td&gt;Place type&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td&gt;place_country_code&lt;/td&gt;
+&lt;td&gt;Country code&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td&gt;place_country&lt;/td&gt;
+&lt;td&gt;Country&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td&gt;place_contained_within&lt;/td&gt;
+&lt;td&gt;Place contained within&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td&gt;place_attributes&lt;/td&gt;
+&lt;td&gt;Place attributes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td&gt;place_bounding_box&lt;/td&gt;
+&lt;td&gt;Place bounding box&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td&gt;source_url&lt;/td&gt;
+&lt;td&gt;Tweet source url&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td&gt;truncated&lt;/td&gt;
+&lt;td&gt;Whether it is truncated&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td&gt;entities&lt;/td&gt;
+&lt;td&gt;a JSON object&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td&gt;extended_entities&lt;/td&gt;
+&lt;td&gt;Another JSON object&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;The dimensions of the dataset:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 7468    3&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;First five observations of both candidates:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;@HillaryClinton&lt;/code&gt;:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;##                                                                                                                                          text
+## 1         Thank you @_VicenteFdez. You&amp;#39;re right—&amp;quot;su voz es su voto.&amp;quot; So grateful to have your support. #JuntosSePuede https://t.co/j9v2K84AV1
+## 2                   No matter where you live you can make sure you&amp;#39;re registered to vote at https://t.co/tTgeqxNqYm.… https://t.co/tWlu8DiGIg
+## 3 RT @azcentral: The Arizona Republic ed board has endorsed @HillaryClinton. See why: https://t.co/FqStTwkesL via @azcopinions #elections2016
+## 4          20 years after Donald bullied a beauty pageant winner for her weight the real &amp;quot;problem&amp;quot; is...still Donald. https://t.co/ZmqYWuN9px
+## 5                   The question in this election: Who can put the plans into action that will make your life better? https://t.co/XreEY9OicG
+##                  time         handle
+## 1 09-28-2016 02:36:13 HillaryClinton
+## 2 09-28-2016 02:10:42 HillaryClinton
+## 3 09-28-2016 01:19:46 HillaryClinton
+## 4 09-28-2016 01:13:08 HillaryClinton
+## 5 09-28-2016 00:22:34 HillaryClinton&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;code&gt;@realDonaldTrump&lt;/code&gt;:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;##                                                                                                                                             text
+## 4191 My supporters are the best! $18 million from hard-working people who KNOW what we can be again! Shatter the record: https://t.co/8ZHGyOth0f
+## 4192   Unbelievable evening in Melbourne Florida w/ 15000 supporters- and an additional 12000 who could not get in. Tha… https://t.co/VU5wh2zXBU
+## 4193                      Join me for a 3pm rally - tomorrow at the Mid-America Center in Council Bluffs Iowa! Tickets:… https://t.co/dfzsbICiXc
+## 4194     Once again we will have a government of by and for the people. Join the MOVEMENT today! https://t.co/lWjYDbPHav https://t.co/uYwJrtZkAe
+## 4195 RT @GOP: On National #VoterRegistrationDay make sure you&amp;#39;re registered to vote so we can #MakeAmericaGreatAgain https://t.co/GKcaLkx8C8 ht…
+##                     time          handle
+## 4191 09-28-2016 02:17:06 realDonaldTrump
+## 4192 09-28-2016 01:03:03 realDonaldTrump
+## 4193 09-27-2016 22:13:24 realDonaldTrump
+## 4194 09-27-2016 21:08:22 realDonaldTrump
+## 4195 09-27-2016 20:31:14 realDonaldTrump&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;According to &lt;a href=&#34;https://trends.google.com/trends/story/election2016&#34;&gt;Google Trends&lt;/a&gt;, the keywords most searched on Google during the 2016 election are “Abortion”, “Immigration”, “Race Issues”, “Economy”, “Affordable Care Act”, “ISIS”, “Climate Change”, “National Debt”, “Gun Control” and “Voting System.” Using &lt;code&gt;gtrendsR&lt;/code&gt;, we randomly picked five of those keywords and queried its search hits by setting &lt;code&gt;geo = &amp;quot;US&amp;quot;&lt;/code&gt; to prevent bias.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;trend1 = gtrends(c(&amp;quot;immigration&amp;quot;, &amp;quot;abortion&amp;quot;, &amp;quot;economy&amp;quot;, &amp;quot;gun control&amp;quot;, &amp;quot;terrorism&amp;quot;), geo = &amp;quot;US&amp;quot;, time = &amp;quot;2016-01-01 2016-12-31&amp;quot;)
+
+plot(trend1)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/project/2016-election-ML/index_files/figure-html/trend%201-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Lo and behold, the trends do not differ much when we queried for Trump and Hillary.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;trend2 = gtrends(c(&amp;quot;hillary&amp;quot;, &amp;quot;trump&amp;quot;), geo = &amp;quot;US&amp;quot;, time = &amp;quot;2016-01-01 2016-12-31&amp;quot;)
+
+plot(trend2)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/project/2016-election-ML/index_files/figure-html/trend%202-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;The trends show the relative popularity of the search query adjusted by the total number searches and time period. We see that these trends look more similar around mid-campaign.&lt;/p&gt;
+&lt;p&gt;Another popular measure of public opinions are by using polls. To that end, we queried &lt;a href=&#34;https://elections.huffingtonpost.com/pollster&#34;&gt;HuffPost Pollster&lt;/a&gt;, a poll that aggregates every poll that claims to represent the population using &lt;code&gt;pollstR&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;We obtained the following charts using the slug &lt;a href=&#34;https://elections.huffingtonpost.com/pollster/2016-general-election-trump-vs-clinton&#34;&gt;2016-general-election-trump-vs-clinton&lt;/a&gt; with &lt;code&gt;pollstR&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;trend.plot&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/project/2016-election-ML/index_files/figure-html/pollstr%20chart-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;We hypothesize that these trends are invoked by the use of sentiments from both political candidates during their campaigns either through speech or social media. Using the trends as the labels and the sentiments as the features, we could attempt to build a model to find out their relationship.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;literature-review&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Literature Review&lt;/h2&gt;
+&lt;blockquote&gt;
+&lt;p&gt;If I have seen further it is by standing on the shoulders of Giants.&lt;/p&gt;
+&lt;p&gt;— &lt;strong&gt;Isaac Newton&lt;/strong&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Indeed, the Google search engine is seen as this black box that confounds from the feeblest to the strongest of men. Only until recent years that it is seen as a treasure trove to people who analyze big data. Seth Stephen-Davidowitz, a former data scientist at Google, addressed in his book &lt;em&gt;Everybody Lies: Big Data, New Data and What the Internet Can Tell Us&lt;/em&gt; that&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;… there’s something very comforting about that little white box that people feel very comfortable telling things that they may not tell anybody else about: Their sexual interests, their health problems, their insecurities. And using this anonymous aggregate data we can learn a lot more about people than we’ve really ever known.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;This reveals an implicit truth: that these data probably understand people more than they do about themselves. Thus, on account to this, many have studied google search queries in hopes to uncover this social behavior. As the Japanese say there are three faces of self: one you show it to the world, the second you show to your close friends, and the third you don’t show it to anyone. For whatever reason, people seem to comfortable with telling everything to the white little box on a daily basis.&lt;/p&gt;
+&lt;p&gt;Another popular metric to “quantify” this social behavior is by using polls that are collected by surveyors. These polls are taken and studied insofar as they represent the population, as written by &lt;a href=&#34;https://elections.huffingtonpost.com/pollster/faq&#34;&gt;Huffpost Pollster&lt;/a&gt;. The survey questions on the polls are designed so much so that that they are unbiased so the survey takers would be able to answer them impartially. However, over the recent years, there have been counless debates against the credibility of the polls.&lt;/p&gt;
+&lt;p&gt;As evident during the 2016 US election, Hillary Clinton led the popular votes by a huge margin and that the polls predicted that she would be the one to take oath of office at the beginning of the next term. However, the contrary happened and that our reliance on predictive analytics on reams of data had outstripped the understanding of its limitations: that they are tools of probabilistic estimate, but still quite useful. A &lt;a href=&#34;http://www.scitepress.org/Papers/2017/64843/64843.pdf&#34;&gt;paper&lt;/a&gt; written by Kassraie, Modirshanechi &amp;amp; Aghajan (2017) attempted to do just that. The authors collected tweets from the public during the election and aggregated their sentiments so that they could be used to perform some predictive evaluation onto weekly election polls. They fitted a linear model by first choosing an uncorrelated set of features that would make the regression’s dimensions perpendicular. The poll ratings are then used as the response. The results are shown on these graphs:&lt;/p&gt;
+&lt;div class=&#34;figure&#34;&gt;
+&lt;img src=&#34;/post/2019-01-06-sentiment-analysis-on-political-tweets-and-predicting-google-trends-search-queries_files/clinton.png&#34; alt=&#34;Figure 1: Predicting online election polls with sentiment data for Clinton.&#34; /&gt;
+&lt;p class=&#34;caption&#34;&gt;Figure 1: Predicting online election polls with sentiment data for Clinton.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&#34;figure&#34;&gt;
+&lt;img src=&#34;/post/2019-01-06-sentiment-analysis-on-political-tweets-and-predicting-google-trends-search-queries_files/trump.png&#34; alt=&#34;Figure 2: Predicting online election polls with sentiment data for Trump.&#34; /&gt;
+&lt;p class=&#34;caption&#34;&gt;Figure 2: Predicting online election polls with sentiment data for Trump.&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;As far as prediction goes, using sentiments on social media to predict election polls can be seen as a viable choice given the above result. Of the two predictions, the model on Clinton achieved a mean error of 0.50 % and that on Trump achieved a mean error of 1.08 %.&lt;/p&gt;
+&lt;p&gt;As alluded previously, prediction using polls as a means of predicting political outcomes has received many criticisms. One of the criticisms allegedly claimed that polls failed to capture the caprice of voters. For example, a Trump loyalist may vote in favor of the opposing party on the online polls but might have behaved otherwise when they cast ballot. For this reason and more, we will attempt to predict social behavior by using as Google Trends with our Twitter dataset.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;approach-design-analysis&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Approach/ Design/ Analysis&lt;/h2&gt;
+&lt;div id=&#34;sentiment-analysis&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Sentiment Analysis&lt;/h3&gt;
+&lt;p&gt;Before performing any ML algorithm on our dataset, let us take a peek into it by performing some sentiment analysis. After “cleaning” the tweets by removing the links, special characters, and stop words, we could obtain the following plots:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/project/2016-election-ML/index_files/figure-html/pre%20sentiment%20analysis-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;This plot shows the number of sentiments used by each candidate over time. Note that this sentiment analysis is based on the frequency at which the word appear on the Twitter dataset. From the plot, we could generally see that one of the candidate’s sentiments are more geared towards the negative, while the other seems remain stable around the positive side fof the rhetoric.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/project/2016-election-ML/index_files/figure-html/word%20count-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Now, from this plot, we can see the words that are contributing to the sentiments from the most positive to the most negative. Here, we chose the words that appear at least 35 times for better interpretation. Knowing this information is useful in designing and validating our hypothesis.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;prediction&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Prediction&lt;/h3&gt;
+&lt;p&gt;Define a popularity vector &lt;span class=&#34;math inline&#34;&gt;\(\mathbf{P}\)&lt;/span&gt; as&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[\mathbf{P} = \frac{|\{w_i : w_i \in W\} |_t}{|W|_t} \in \{[0, 1]\}_{t=1}^n\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;, which is approximately how the Google Trend’s search hits are defined after adjusting for time. We want to estimate &lt;span class=&#34;math inline&#34;&gt;\(\mathbf{\hat{P}}\)&lt;/span&gt; using the sentiments to predict social behavior.&lt;/p&gt;
+&lt;p&gt;To that end, we would like to design a document-term matrix by keeping only the sentiments and and then fit several models to estimate the Google Trends.&lt;/p&gt;
+&lt;div id=&#34;cleaning-the-data&#34; class=&#34;section level5&#34;&gt;
+&lt;h5&gt;1) &lt;strong&gt;Cleaning the data&lt;/strong&gt;&lt;/h5&gt;
+&lt;p&gt;We are mostly interested in the tweets of the dataset and their timestamps, hence we would like to clean them so that we will only get the sentiments to obtain the document-term matrix. We will use the &lt;code&gt;tm&lt;/code&gt; package to achieve that.&lt;/p&gt;
+&lt;p&gt;The following code is used to obtain the document-term matrix:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Obtaining a corpus object
+
+corpus = as.character(tweets_mutated[, &amp;quot;tweets&amp;quot;]) %&amp;gt;%
+  removeURL %&amp;gt;%
+  removeSpecial %&amp;gt;%
+  stemWord %&amp;gt;%
+  VectorSource %&amp;gt;%
+  VCorpus
+
+# Transforming the corpus
+ 
+cleaned_corpus = tm_map(corpus, tolower) %&amp;gt;%
+  tm_map(PlainTextDocument) %&amp;gt;%
+  tm_map(removePunctuation) %&amp;gt;%
+  tm_map(removeNumbers) %&amp;gt;%
+  tm_map(removeWords, stopwords(&amp;quot;english&amp;quot;)) %&amp;gt;%
+  tm_map(stripWhitespace)
+ 
+# Obtaining the Document Term Matrix
+ 
+DTM = DocumentTermMatrix(cleaned_corpus) %&amp;gt;% 
+  removeSparseTerms(0.99) %&amp;gt;%
+  as.matrix
+
+# Merging the data
+
+res_H = cbind.data.frame(DTM, &amp;quot;hits&amp;quot; = tweets_mutated$hillary_hits/100 )
+res_T = cbind.data.frame(DTM, &amp;quot;hits&amp;quot; = tweets_mutated$trump_hits/100 )&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The idea is to pipeline the tweets from the dataset through a process of transformations. An initial glimpse of the data reveals that the some of the tweets have links and special characters (such as emojis) that needed to be removed, hence we created the functions &lt;code&gt;removeURL&lt;/code&gt; and &lt;code&gt;removeSpecial&lt;/code&gt; to do just that. Furthermore, we recognized that, depending on the context, some words mean the same thing, hence we had to “stem” the words so that they will return to their original word. A function called &lt;code&gt;hunspell_stem()&lt;/code&gt; from the &lt;code&gt;hunspell&lt;/code&gt; package allowed us to do just that (and more efficiently than a similar from the &lt;code&gt;tm&lt;/code&gt; package). The function is included in the functional &lt;code&gt;stemWord&lt;/code&gt; so that the tweets that go through it will return the word in its root form.&lt;/p&gt;
+&lt;p&gt;Suppose a vector of characters:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[1] &amp;quot;loving&amp;quot; &amp;quot;love&amp;quot; &amp;quot;loved&amp;quot; &amp;quot;lovely&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Depending on the context, we would want a vector that would be expressed as following:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[1] &amp;quot;love&amp;quot; &amp;quot;love&amp;quot; &amp;quot;loved&amp;quot; &amp;quot;love&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This process is important so that the document term matrix can pick up on the frequency at which the sentiments appear since it usually returns a matrix that is sparse and that that would be problematic when interpreting the results. Furthermore, we let the tweets ran through some more functions like &lt;code&gt;tolower&lt;/code&gt;,&lt;code&gt;removePunctuation&lt;/code&gt;, &lt;code&gt;removeNumbers&lt;/code&gt;, &lt;code&gt;removeWords&lt;/code&gt; (to remove English stopwords) and &lt;code&gt;stripWhiteSpace&lt;/code&gt; to obtain tweets of only sentiments.&lt;/p&gt;
+&lt;p&gt;Note that before we had to go through this process, we had to concatenate the strings by each day to match with the number of hits we have since we have too have them by day. This is in line with our hypothesis that the search hits are not only affected by the sentiments invoked by one candidate individually, but rather collectively.&lt;/p&gt;
+&lt;p&gt;After transforming the tweets, we transformed them into a document-term matrix and remove sparse terms.&lt;/p&gt;
+&lt;p&gt;The dimension of our document-term matrix is:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dim(DTM)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 268 226&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;And now, we are ready to do our analysis.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;logistic-regression&#34; class=&#34;section level4&#34;&gt;
+&lt;h4&gt;2) &lt;strong&gt;Logistic Regression&lt;/strong&gt;&lt;/h4&gt;
+&lt;p&gt;With the dataset, we attempt to fit a logistic regression since our relative popularity (i.e. search hits) is designed to be bounded from 0 to 1 and signify proportions. First, we will crudely fit the response with all of the features. Once we do that, we will get the following results:&lt;/p&gt;
+&lt;div id=&#34;hillarys-search-hits-logistic-diagnostic&#34; class=&#34;section level5&#34;&gt;
+&lt;h5&gt;&lt;strong&gt;Hillary’s search hits logistic diagnostic:&lt;/strong&gt;&lt;/h5&gt;
+&lt;p&gt;&lt;img src=&#34;/project/2016-election-ML/index_files/figure-html/logistic-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;trumps-search-hits-logistic-diagnostic&#34; class=&#34;section level5&#34;&gt;
+&lt;h5&gt;&lt;strong&gt;Trump’s search hits logistic diagnostic:&lt;/strong&gt;&lt;/h5&gt;
+&lt;p&gt;&lt;img src=&#34;/project/2016-election-ML/index_files/figure-html/trump%20logistic-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;If we look at the diagnostic, we see that none of the assumptions for inference are violated, so we could easily perform the usual hypothesis testings. From the plots, we see that we almost perfectly fit the trends with the given design matrix. For both of the models, we obtain the following Mean Squared Error (MSE):&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# MSE for Hillary&amp;#39;s model (adjusted for scale)
+mse(logit_H$fitted.values,res_H$hits)*100^2&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 1.043019&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# MSE for Trump&amp;#39;s model (adjusted for scale)
+mse(logit_T$fitted.values,res_T$hits)*100^2&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 22.39258&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;However, if we care about parsimony, we may wish to perform some variable selection with AIC since AIC generally works well with prediction and that it penalizes much less. To that end, we will use the &lt;code&gt;stepAIC()&lt;/code&gt; function:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Number of features used
+
+## On Hillary&amp;#39;s GTrends
+length(AIC.glm_H$coefficients) - 1 &lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 226&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;## On Trump&amp;#39;s GTrends 
+length(AIC.glm_T$coefficients) - 1 &lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 226&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We see that none of the variables were penalized, hence the MSEs for both models remain the same. This variable selection method does work that well because the directional variable selection has a one-way solution path thus it may not exhaust all possible subset selection.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;lasso-vs-ridge-regressions&#34; class=&#34;section level4&#34;&gt;
+&lt;h4&gt;3) &lt;strong&gt;LASSO vs Ridge Regressions&lt;/strong&gt;&lt;/h4&gt;
+&lt;p&gt;We may also be interested in doing a penalized linear regressions to find out which variables matter more in the estimate. Two of the most common penalized regressions are the LASSO and Ridge regressions, with the former penalizes the coefficients more. Since our design matrix is a document-term matrix, some terms may not be that useful, hence using the penalized regressions can help us ignore those variables. We attempt to tune the penalty for LASSO first:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# LASSO fit for Hillary
+cvH.fit=cv.glmnet(as.matrix(res_H[,1:227]),as.matrix(res_H$hits),type.measure=&amp;quot;mse&amp;quot;)
+plot(cvH.fit)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/project/2016-election-ML/index_files/figure-html/lasso-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# LASSO fit for Trump
+cvT.fit=cv.glmnet(as.matrix(res_T[,1:227]),as.matrix(res_T$hits),type.measure=&amp;quot;mse&amp;quot;)
+plot(cvT.fit)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/project/2016-election-ML/index_files/figure-html/lasso-2.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# The tuning parameters
+
+## For Hillary
+cvH.fit$lambda.1se&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.001972102&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;## For Trump
+cvT.fit$lambda.1se&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.0046166&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The parameters chosen here are the ones that minimize the MSE, hence we will be using them as the parameter to fit our models.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;## MSE for Hillary&amp;#39;s LASSO model (adjusted for scale)
+mse(yhat111,res_H$hits)*100^2&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.03889185&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;## MSE for Trump&amp;#39;s LASSO model (adjusted for scale)
+mse(yhat222,res_T$hits)*100^2&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.21313&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We see that the MSE for both of the plots seem to fit perfectly, which is a concern since we have a sparse matrix. Due to this, performing a gradient descent will not be meaningful.&lt;/p&gt;
+&lt;p&gt;Futhermore, we may now wish to perform a Ridge regression.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Define a sequence of lambdas
+l = seq(0, 1000, by = 0.01)
+
+# Fitting the models with lambdas
+ridge.H = lm.ridge(hits~., res_H, lambda = l)
+ridge.T = lm.ridge(hits~., res_T, lambda = l)
+
+# Plotting GCV against lambdas
+
+plot(ridge.H$lambda, ridge.H$GCV, col = &amp;quot;darkorange&amp;quot; ,type = &amp;quot;l&amp;quot;, ylab = &amp;quot;GCV&amp;quot;, xlab = &amp;quot;lambda&amp;quot;, main = &amp;quot;GCV against lambdas for Hillary&amp;#39;s Ridge Regression&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/project/2016-election-ML/index_files/figure-html/ridge%20regression-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;plot(ridge.T$lambda, ridge.T$GCV, col = &amp;quot;darkorange&amp;quot; ,type = &amp;quot;l&amp;quot;, ylab = &amp;quot;GCV&amp;quot;, xlab = &amp;quot;lambda&amp;quot;, main = &amp;quot;GCV against lambdas for Trump&amp;#39;s Ridge Regression&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/project/2016-election-ML/index_files/figure-html/ridge%20regression-2.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Similar to LASSO, the Ridge regression has the same tuning parameter for penalty, which we will tune differently than LASSO by using the GCV metric. After obtaining the minimum GCV that corresponds with the lambdas, we will then use that lambda to fit our models.&lt;/p&gt;
+&lt;p&gt;The following are the MSE’s for both models:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;## MSE for Hillary&amp;#39;s Ridge model (adjusted for scale)
+mse(y.pred.H,res_H$hits)*100^2&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 14.93831&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;## MSE for Trump&amp;#39;s Ridge model (adjusted for scale)
+mse(y.pred.T, res_T$hits)*100^2&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 130.2933&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We see that Ridge regressions perform badly for Trump’s Google Trends hits relative to that of Hillary. We say that this might be due to the sharp peaks that the Trump’s hits may have, or that maybe it is due to the dataset being collected since Trump’s tweets are fewer than Hillary’s.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;random-forest&#34; class=&#34;section level4&#34;&gt;
+&lt;h4&gt;4) &lt;strong&gt;Random Forest&lt;/strong&gt;&lt;/h4&gt;
+&lt;p&gt;With Random forest we first try the default version, and realize that by simply doing &lt;code&gt;randomForest()&lt;/code&gt; and setting up the &lt;code&gt;ntree&lt;/code&gt; we still have a pretty bad model. Therefore we start tunning the parameters of &lt;code&gt;mtry&lt;/code&gt; and ‘nodesize’:&lt;/p&gt;
+&lt;p&gt;We can see that Clinton ’s optimal &lt;code&gt;mtry&lt;/code&gt; is 80 and optimal &lt;code&gt;nodesize&lt;/code&gt; is 32. Trump’s optimal &lt;code&gt;mtry&lt;/code&gt; is 77 and its optimal &lt;code&gt;nodesize&lt;/code&gt; is 37.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/project/2016-election-ML/index_files/figure-html/random%20Forest-1.png&#34; width=&#34;672&#34; /&gt;&lt;img src=&#34;/project/2016-election-ML/index_files/figure-html/random%20Forest-2.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;From the variable importance plots of both models, the term &lt;code&gt;candidates&lt;/code&gt; seem to show up the most in both.&lt;/p&gt;
+&lt;p&gt;The result of the Mean Squared Errors are listed as follows:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;## MSE for Hillary&amp;#39;s RF model (adjusted for scale)
+mse(rf.H$predicted, res_H$hits)*100^2&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 35.92742&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;## MSE for Trump&amp;#39;s RF model (adjusted for scale)
+mse(rf.T$predicted, res_T$hits)*100^2&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 224.5075&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;feature-selection&#34; class=&#34;section level4&#34;&gt;
+&lt;h4&gt;5) &lt;strong&gt;Feature Selection&lt;/strong&gt;&lt;/h4&gt;
+&lt;p&gt;We could attempt to find the features that greatly affect the prediction. However, since we have features of only factor variables, computing the distance matrices may be a problem. As such, we could use the &lt;code&gt;FactoMineR&lt;/code&gt; package to solve this problem since it would allow us to compute the principal components for mixed variables&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;fact = res_H[,1:226] %&amp;gt;% lapply(as.factor) %&amp;gt;% do.call(cbind, .)
+res.pca=PCA(fact[,1:226])&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/project/2016-election-ML/index_files/figure-html/principal%20component-1.png&#34; width=&#34;672&#34; /&gt;&lt;img src=&#34;/project/2016-election-ML/index_files/figure-html/principal%20component-2.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;We see that doing a feature selection by PCA from each of the plots since they did not contribute too much to the explanations of the variance for both dimensions. Therefore, we say that using PCA on a document-term matrix may not work that well since our variables are not continuous.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;discussion&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Discussion&lt;/h3&gt;
+&lt;p&gt;From the results, we see that the outcome of our prediction vary a lot based on the characteristics of the methods we applied and how certain methods are impacted by the data sets.&lt;/p&gt;
+&lt;p&gt;For the logistic model, by applying AIC for variable selection, we see that none of the variables were removed. This method may not work that well since the solution path may be one-way only, not exhaustive. Another method that we could have done is to use the best subset selection, which does an exhaustive search on all features to find the best subset of features that would fit the model best.&lt;/p&gt;
+&lt;p&gt;For the penalized regression models, we see that we encounter a problem with overfitting for the LASSO regression model. This may be due to the document term matrix being sparse, so LASSO had to force its ranks on all the covariates. Although we fit an almost perfect linear model with substantially low MSE, this may not be desirable if we take into account parsimony and the bias-variance tradeoff. For the Ridge regression, we found out that the model on Trump’s search hits did not work that well. If we examine the comparison plots closely, we found that the predicted values did not fit well when the trend had some sharp peaks. Furthermore, this may be due to the fact that Trump’s tweets are fewer than Hillary’s, which may have caused the fitted model to work better using Hillary’s search hits than Trump’s.&lt;/p&gt;
+&lt;p&gt;Using the method of Random Forest, we found that the models did not work that well, even after the we tune for &lt;code&gt;mtry&lt;/code&gt; around &lt;code&gt;p/3&lt;/code&gt; and various &lt;code&gt;nodesize&lt;/code&gt;. The variable importance also here used IncNodePurity, which may be the default for sparse document term matrix. We also realized that the &lt;code&gt;randomForest()&lt;/code&gt; did not list the coefficients for our model, which may also be caused by the model matrix being sparse.&lt;/p&gt;
+&lt;p&gt;To summarize the methods, we computed the MSEs for each method to compare and contrast:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr class=&#34;header&#34;&gt;
+&lt;th align=&#34;center&#34;&gt;Method&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;Trump&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;Hillary&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;Logistic&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;22.43&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;1.05&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;LASSO&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;0.21&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;0.04&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;Ridge&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;130.35&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;15.09&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;Random Forest&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;227.79&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;36.75&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;We see that among the fitted models, the LASSO regression works the best in terms of Mean Squared Errors, while Random Forest performed the worst even after tuning the parameters &lt;code&gt;mtry&lt;/code&gt; and &lt;code&gt;nodesize&lt;/code&gt;. To present a visual result, we produced the following plots:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;H.comparison.plot&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/project/2016-election-ML/index_files/figure-html/comparison%20plots%202-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;T.comparison.plot&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/project/2016-election-ML/index_files/figure-html/comparison%20plots%202-2.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;We can see from the visualization which methods follow the patterns well.&lt;/p&gt;
+&lt;p&gt;Finally, for the feature selection, we used the PCA method to find the features that would explain the variation the most. Given that we have columns of almost binary values, PCA would not work that well since it works best for continous variables. As can be seen from the PCA variance plot, only 7.4% of variation is explained by the terms in the document-term matrix. Another method that could have been done is by using Non-Negative Matrix Factorization (NMF), which may work well on a document-term matrix whose sentiments express themselves well in terms of frequencies at each document.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;conclusion&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Conclusion&lt;/h3&gt;
+&lt;p&gt;In conclusion, we can able to say that the sentiments on social media can predict public opinions as a proxy for political outcomes. Our potential pitfalls might be that the number of characters are pretty small for the data set by looking at &lt;code&gt;nchar()&lt;/code&gt;, resulting in fewer sentiments for our analysis. If we are doing similar analysis in the future, we might choose data set with greater density for both candidates of the prediction and perform classification to the tweets into any class we are interested in if we have more time.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;reference&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Reference&lt;/h3&gt;
+&lt;p&gt;Kassraie, Modirshanechi &amp;amp; Aghajan. (2017). “Election Vote Share Prediction using a Sentiment-based Fusion of Twitter Data with Google Trends and Online Polls.” &lt;em&gt;Scite Press&lt;/em&gt;, &lt;a href=&#34;http://www.scitepress.org/Papers/2017/64843/64843.pdf&#34; class=&#34;uri&#34;&gt;http://www.scitepress.org/Papers/2017/64843/64843.pdf&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Stephens-Davidowitz, Seth. (2017). “Everybody Lies: Big Data, New Data, and What the Internet Can Tell Us About Who We Really Are.” &lt;em&gt;The B&amp;amp;N Sci-Fi and Fantasy Blog&lt;/em&gt;, Barnes &amp;amp; Noble Reads, &lt;a href=&#34;https://www.barnesandnoble.com/w/everybody-lies-seth-stephens-davidowitz/1125687298&#34; class=&#34;uri&#34;&gt;https://www.barnesandnoble.com/w/everybody-lies-seth-stephens-davidowitz/1125687298&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Travel Notes</title>
+      <link>/haikus-1/</link>
+      <pubDate>Fri, 28 Dec 2018 00:00:00 -0600</pubDate>
+      
+      <guid>/haikus-1/</guid>
+      <description>&lt;p&gt;i&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;Sounds of needle leaves&lt;/p&gt;
+
+&lt;p&gt;bristle through my ears over&lt;/p&gt;
+
+&lt;p&gt;the sunbled streamlet&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;ii&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;Clinking of pennies&lt;/p&gt;
+
+&lt;p&gt;at an affluent building,&lt;/p&gt;
+
+&lt;p&gt;a bedridden pauper&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;iii&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;Swans in ballet shoes&lt;/p&gt;
+
+&lt;p&gt;under the spotlit bedlam&lt;/p&gt;
+
+&lt;p&gt;tip toe, tippy toe&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;iv&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;A single mother&lt;/p&gt;
+
+&lt;p&gt;And in her sinewy arms&lt;/p&gt;
+
+&lt;p&gt;rests a smiling child&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;v&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;Robins chirruping&lt;/p&gt;
+
+&lt;p&gt;under the blanket of clouds&lt;/p&gt;
+
+&lt;p&gt;near the verdant meadow&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;vi&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;City lights and roads&lt;/p&gt;
+
+&lt;p&gt;stand witness to waste flyers&lt;/p&gt;
+
+&lt;p&gt;and drunken high proles&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;vii&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;Near the dark alleys&lt;/p&gt;
+
+&lt;p&gt;I heard noises not acute&lt;/p&gt;
+
+&lt;p&gt;yet certainly trenchant&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;viii&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;The sound of water&lt;/p&gt;
+
+&lt;p&gt;trickle is just as clear as&lt;/p&gt;
+
+&lt;p&gt;the rushing river&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;ix&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;Four hundred twenty&lt;/p&gt;
+
+&lt;p&gt;is the sigil of despair&lt;/p&gt;
+
+&lt;p&gt;not of alcohol&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;x&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;We were arsonists&lt;/p&gt;
+
+&lt;p&gt;choking the birds with the sky&lt;/p&gt;
+
+&lt;p&gt;they used to dote on&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;xi&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;Green cities are&lt;/p&gt;
+
+&lt;p&gt;but Cubist oases of&lt;/p&gt;
+
+&lt;p&gt;the allure they were&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;xii&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;As though, in the train&lt;/p&gt;
+
+&lt;p&gt;time passes by more slowly&lt;/p&gt;
+
+&lt;p&gt;than the life of me&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;xiii&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt; Blue-and-green marvel&lt;/p&gt;
+
+&lt;p&gt;tethered by its corpus&lt;/p&gt;
+
+&lt;p&gt;thrown and upended&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;xiv&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;Travelers brooding&lt;/p&gt;
+
+&lt;p&gt;over new abodes aren’t that&lt;/p&gt;
+
+&lt;p&gt;extraterrestrial&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;xv&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;Animals skirting&lt;/p&gt;
+
+&lt;p&gt;the edge of the asylum&lt;/p&gt;
+
+&lt;p&gt;hither and thither&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;xvi&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;Near the construction&lt;/p&gt;
+
+&lt;p&gt;a rainbow drew itself on&lt;/p&gt;
+
+&lt;p&gt;an oil spilled river&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Example Page</title>
+      <link>/tutorial/example/</link>
+      <pubDate>Sun, 09 Sep 2018 00:00:00 -0500</pubDate>
+      
+      <guid>/tutorial/example/</guid>
+      <description>
+
+&lt;p&gt;In this tutorial, I&amp;rsquo;ll share my top 10 tips for getting started with Academic:&lt;/p&gt;
+
+&lt;h2 id=&#34;tip-1&#34;&gt;Tip 1&lt;/h2&gt;
+
+&lt;p&gt;&amp;hellip;&lt;/p&gt;
+
+&lt;h2 id=&#34;tip-2&#34;&gt;Tip 2&lt;/h2&gt;
+
+&lt;p&gt;&amp;hellip;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Privacy Policy</title>
+      <link>/privacy/</link>
+      <pubDate>Thu, 28 Jun 2018 00:00:00 -0500</pubDate>
+      
+      <guid>/privacy/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Travel Notes</title>
+      <link>/haikus-2/</link>
+      <pubDate>Thu, 28 Jun 2018 00:00:00 -0500</pubDate>
+      
+      <guid>/haikus-2/</guid>
+      <description>&lt;p&gt;i&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;Sounds of needle leaves&lt;/p&gt;
+
+&lt;p&gt;bristle through my ears over&lt;/p&gt;
+
+&lt;p&gt;the sunbled streamlet&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;ii&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;Clinking of pennies&lt;/p&gt;
+
+&lt;p&gt;at an affluent building,&lt;/p&gt;
+
+&lt;p&gt;a bedridden pauper&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;iii&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;Swans in ballet shoes&lt;/p&gt;
+
+&lt;p&gt;under the spotlit bedlam&lt;/p&gt;
+
+&lt;p&gt;tip toe, tippy toe&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;iv&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;A single mother&lt;/p&gt;
+
+&lt;p&gt;And in her sinewy arms&lt;/p&gt;
+
+&lt;p&gt;rests a smiling child&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;v&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;Robins chirruping&lt;/p&gt;
+
+&lt;p&gt;under the blanket of clouds&lt;/p&gt;
+
+&lt;p&gt;near the verdant meadow&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;vi&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;City lights and roads&lt;/p&gt;
+
+&lt;p&gt;stand witness to waste flyers&lt;/p&gt;
+
+&lt;p&gt;and drunken high proles&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;vii&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;Near the dark alleys&lt;/p&gt;
+
+&lt;p&gt;I heard noises not acute&lt;/p&gt;
+
+&lt;p&gt;yet certainly trenchant&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;viii&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;The sound of water&lt;/p&gt;
+
+&lt;p&gt;trickle is just as clear as&lt;/p&gt;
+
+&lt;p&gt;the rushing river&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;ix&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;Four hundred twenty&lt;/p&gt;
+
+&lt;p&gt;is the sigil of despair&lt;/p&gt;
+
+&lt;p&gt;not of alcohol&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;x&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;We were arsonists&lt;/p&gt;
+
+&lt;p&gt;choking the birds with the sky&lt;/p&gt;
+
+&lt;p&gt;they used to dote on&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;xi&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;Green cities are&lt;/p&gt;
+
+&lt;p&gt;but Cubist oases of&lt;/p&gt;
+
+&lt;p&gt;the allure they were&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;xii&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;As though, in the train&lt;/p&gt;
+
+&lt;p&gt;time passes by more slowly&lt;/p&gt;
+
+&lt;p&gt;than the life of me&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;xiii&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt; Blue-and-green marvel&lt;/p&gt;
+
+&lt;p&gt;tethered by its corpus&lt;/p&gt;
+
+&lt;p&gt;thrown and upended&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;xiv&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;Travelers brooding&lt;/p&gt;
+
+&lt;p&gt;over new abodes aren’t that&lt;/p&gt;
+
+&lt;p&gt;extraterrestrial&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;xv&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;Animals skirting&lt;/p&gt;
+
+&lt;p&gt;the edge of the asylum&lt;/p&gt;
+
+&lt;p&gt;hither and thither&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;xvi&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;Near the construction&lt;/p&gt;
+
+&lt;p&gt;a rainbow drew itself on&lt;/p&gt;
+
+&lt;p&gt;an oil spilled river&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Example Talk</title>
+      <link>/talk/example/</link>
+      <pubDate>Sun, 01 Jan 2017 00:00:00 -0600</pubDate>
+      
+      <guid>/talk/example/</guid>
+      <description>&lt;div class=&#34;alert alert-note&#34;&gt;
+  &lt;p&gt;Click on the &lt;strong&gt;Slides&lt;/strong&gt; button above to view the built-in slides feature.&lt;/p&gt;
+
+&lt;/div&gt;
+
+
+&lt;p&gt;Slides can be added in a few ways:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Create&lt;/strong&gt; slides using Academic&amp;rsquo;s &lt;em&gt;Slides&lt;/em&gt; feature and link using &lt;code&gt;url_slides&lt;/code&gt; parameter in the front matter of the talk file&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Upload&lt;/strong&gt; an existing slide deck to &lt;code&gt;static/&lt;/code&gt; and link using &lt;code&gt;url_slides&lt;/code&gt; parameter in the front matter of the talk file&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Embed&lt;/strong&gt; your slides (e.g. Google Slides) or presentation video on this page using &lt;a href=&#34;https://sourcethemes.com/academic/docs/writing-markdown-latex/&#34; target=&#34;_blank&#34;&gt;shortcodes&lt;/a&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Further talk details can easily be added to this page using &lt;em&gt;Markdown&lt;/em&gt; and $\rm \LaTeX$ math code.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>A Person Re-Identification System For Mobile Devices</title>
+      <link>/software/person-re-id/</link>
+      <pubDate>Tue, 01 Sep 2015 00:00:00 -0500</pubDate>
+      
+      <guid>/software/person-re-id/</guid>
+      <description>&lt;p&gt;More detail can easily be written here using &lt;em&gt;Markdown&lt;/em&gt; and $\rm \LaTeX$ math code.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Mobile visual clothing search</title>
+      <link>/software/clothing-search/</link>
+      <pubDate>Mon, 01 Jul 2013 00:00:00 -0500</pubDate>
+      
+      <guid>/software/clothing-search/</guid>
+      <description>&lt;p&gt;More detail can easily be written here using &lt;em&gt;Markdown&lt;/em&gt; and $\rm \LaTeX$ math code.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>/haikus/1/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/haikus/1/</guid>
+      <description>
+
+
+&lt;p&gt;i&lt;/p&gt;
+&lt;p&gt;Sounds of needle leaves&lt;/p&gt;
+&lt;p&gt;bristle through my ears over&lt;/p&gt;
+&lt;p&gt;the sunbled streamlet&lt;/p&gt;
+&lt;p&gt;ii&lt;/p&gt;
+&lt;p&gt;Clinking of pennies&lt;/p&gt;
+&lt;p&gt;at an affluent building,&lt;/p&gt;
+&lt;p&gt;a bedridden pauper&lt;/p&gt;
+&lt;p&gt;iii&lt;/p&gt;
+&lt;p&gt;Swans in ballet shoes&lt;/p&gt;
+&lt;p&gt;under the spotlit bedlam&lt;/p&gt;
+&lt;p&gt;tip toe, tippy toe&lt;/p&gt;
+&lt;p&gt;iv&lt;/p&gt;
+&lt;p&gt;A single mother&lt;/p&gt;
+&lt;p&gt;And in her sinewy arms&lt;/p&gt;
+&lt;p&gt;rests a smiling child&lt;/p&gt;
+&lt;p&gt;v&lt;/p&gt;
+&lt;p&gt;Robins chirruping&lt;/p&gt;
+&lt;p&gt;under the blanket of clouds&lt;/p&gt;
+&lt;p&gt;near the verdant meadow&lt;/p&gt;
+&lt;p&gt;vi&lt;/p&gt;
+&lt;p&gt;City lights and roads&lt;/p&gt;
+&lt;p&gt;stand witness to waste flyers&lt;/p&gt;
+&lt;p&gt;and drunken high proles&lt;/p&gt;
+&lt;p&gt;vii&lt;/p&gt;
+&lt;p&gt;Near the dark alleys&lt;/p&gt;
+&lt;p&gt;I heard noises not acute&lt;/p&gt;
+&lt;p&gt;yet certainly trenchant&lt;/p&gt;
+&lt;p&gt;viii&lt;/p&gt;
+&lt;p&gt;The sound of water&lt;/p&gt;
+&lt;p&gt;trickle is just as clear as&lt;/p&gt;
+&lt;p&gt;the rushing river&lt;/p&gt;
+&lt;p&gt;ix&lt;/p&gt;
+&lt;p&gt;Four hundred twenty&lt;/p&gt;
+&lt;p&gt;is the sigil of despair&lt;/p&gt;
+&lt;p&gt;not of alcohol&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Slides</title>
+      <link>/slides/example-slides/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/slides/example-slides/</guid>
+      <description>
+
+&lt;h1 id=&#34;welcome-to-slides&#34;&gt;Welcome to Slides&lt;/h1&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://sourcethemes.com/academic/&#34; target=&#34;_blank&#34;&gt;Academic&lt;/a&gt;&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;h2 id=&#34;features&#34;&gt;Features&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Efficiently write slides in Markdown&lt;/li&gt;
+&lt;li&gt;3-in-1: Create, Present, and Publish your slides&lt;/li&gt;
+&lt;li&gt;Supports speaker notes&lt;/li&gt;
+&lt;li&gt;Mobile friendly slides&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;hr /&gt;
+
+&lt;h2 id=&#34;controls&#34;&gt;Controls&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Next: &lt;code&gt;Right Arrow&lt;/code&gt; or &lt;code&gt;Space&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Previous: &lt;code&gt;Left Arrow&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Start: &lt;code&gt;Home&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Finish: &lt;code&gt;End&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Overview: &lt;code&gt;Esc&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Speaker notes: &lt;code&gt;S&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Fullscreen: &lt;code&gt;F&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Zoom: &lt;code&gt;Alt + Click&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/hakimel/reveal.js#pdf-export&#34; target=&#34;_blank&#34;&gt;PDF Export&lt;/a&gt;: &lt;code&gt;E&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;hr /&gt;
+
+&lt;h2 id=&#34;code-highlighting&#34;&gt;Code Highlighting&lt;/h2&gt;
+
+&lt;p&gt;Inline code: &lt;code&gt;variable&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Code block:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;porridge = &amp;quot;blueberry&amp;quot;
+if porridge == &amp;quot;blueberry&amp;quot;:
+    print(&amp;quot;Eating...&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;hr /&gt;
+
+&lt;h2 id=&#34;math&#34;&gt;Math&lt;/h2&gt;
+
+&lt;p&gt;In-line math: $x + y = z$&lt;/p&gt;
+
+&lt;p&gt;Block math:&lt;/p&gt;
+
+&lt;p&gt;$$
+f\left( x \right) = \;\frac{{2\left( {x + 4} \right)\left( {x - 4} \right)}}{{\left( {x + 4} \right)\left( {x + 1} \right)}}
+$$&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;h2 id=&#34;fragments&#34;&gt;Fragments&lt;/h2&gt;
+
+&lt;p&gt;Make content appear incrementally&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{{% fragment %}} One {{% /fragment %}}
+{{% fragment %}} **Two** {{% /fragment %}}
+{{% fragment %}} Three {{% /fragment %}}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Press &lt;code&gt;Space&lt;/code&gt; to play!&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#34;fragment &#34; &gt;
+  One
+&lt;/span&gt;
+&lt;span class=&#34;fragment &#34; &gt;
+  &lt;strong&gt;Two&lt;/strong&gt;
+&lt;/span&gt;
+&lt;span class=&#34;fragment &#34; &gt;
+  Three
+&lt;/span&gt;&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;A fragment can accept two optional parameters:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;class&lt;/code&gt;: use a custom style (requires definition in custom CSS)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;weight&lt;/code&gt;: sets the order in which a fragment appears&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;hr /&gt;
+
+&lt;h2 id=&#34;speaker-notes&#34;&gt;Speaker Notes&lt;/h2&gt;
+
+&lt;p&gt;Add speaker notes to your presentation&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-markdown&#34;&gt;{{% speaker_note %}}
+- Only the speaker can read these notes
+- Press `S` key to view
+{{% /speaker_note %}}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Press the &lt;code&gt;S&lt;/code&gt; key to view the speaker notes!&lt;/p&gt;
+
+&lt;aside class=&#34;notes&#34;&gt;
+  &lt;ul&gt;
+&lt;li&gt;Only the speaker can read these notes&lt;/li&gt;
+&lt;li&gt;Press &lt;code&gt;S&lt;/code&gt; key to view&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;/aside&gt;
+
+&lt;hr /&gt;
+
+&lt;h2 id=&#34;themes&#34;&gt;Themes&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;black: Black background, white text, blue links (default)&lt;/li&gt;
+&lt;li&gt;white: White background, black text, blue links&lt;/li&gt;
+&lt;li&gt;league: Gray background, white text, blue links&lt;/li&gt;
+&lt;li&gt;beige: Beige background, dark text, brown links&lt;/li&gt;
+&lt;li&gt;sky: Blue background, thin dark text, blue links&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;hr /&gt;
+
+&lt;ul&gt;
+&lt;li&gt;night: Black background, thick white text, orange links&lt;/li&gt;
+&lt;li&gt;serif: Cappuccino background, gray text, brown links&lt;/li&gt;
+&lt;li&gt;simple: White background, black text, blue links&lt;/li&gt;
+&lt;li&gt;solarized: Cream-colored background, dark green text, blue links&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;hr /&gt;
+
+
+&lt;section data-noprocess data-shortcode-slide
+  
+      
+      data-background-image=&#34;/img/boards.jpg&#34;
+  &gt;
+
+
+&lt;h2 id=&#34;custom-slide&#34;&gt;Custom Slide&lt;/h2&gt;
+
+&lt;p&gt;Customize the slide style and background&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-markdown&#34;&gt;{{&amp;lt; slide background-image=&amp;quot;/img/boards.jpg&amp;quot; &amp;gt;}}
+{{&amp;lt; slide background-color=&amp;quot;#0000FF&amp;quot; &amp;gt;}}
+{{&amp;lt; slide class=&amp;quot;my-style&amp;quot; &amp;gt;}}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;hr /&gt;
+
+&lt;h2 id=&#34;custom-css-example&#34;&gt;Custom CSS Example&lt;/h2&gt;
+
+&lt;p&gt;Let&amp;rsquo;s make headers navy colored.&lt;/p&gt;
+
+&lt;p&gt;Create &lt;code&gt;assets/css/reveal_custom.css&lt;/code&gt; with:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-css&#34;&gt;.reveal section h1,
+.reveal section h2,
+.reveal section h3 {
+  color: navy;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;hr /&gt;
+
+&lt;h1 id=&#34;questions&#34;&gt;Questions?&lt;/h1&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://discourse.gohugo.io&#34; target=&#34;_blank&#34;&gt;Ask&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://sourcethemes.com/academic/docs/&#34; target=&#34;_blank&#34;&gt;Documentation&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Source Themes Academic 3.3.0">
+  <meta name="generator" content="Hugo 0.53" />
+  <meta name="author" content="Hassan Rahim Kamil">
+
+  
+  
+  
+  
+    
+  
+  <meta name="description" content="Could we predict political outcomes with sentiments?">
+
+  
+  <link rel="alternate" hreflang="en-us" href="/project/2016-election-ml/sentiment-analysis-on-political-tweets-and-predicting-google-trends-search-queries/">
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <meta name="theme-color" content="#5a7eae">
+  
+
+  
+  
+  
+  
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha256-eSi1q2PG6J7g7ib17yAaWMcrr5GrtohYChqibrV7PBE=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.6/css/academicons.min.css" integrity="sha256-uFVgMKfistnJAfoCUQigIl+JfUaP47GrRKjf6CTPVmw=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.0/css/all.css" integrity="sha384-aOkxzJ5uQz7WBObEZcHvV5JvRW3TUc2rNPA7pe3AwnsUohiw1Vj2Rgx2KSOkF5+h" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" integrity="sha256-ygkqlh3CYSUri3LhQxzdcm0n1EQvH2Y+U5S2idbLtxs=" crossorigin="anonymous">
+
+    
+    
+    
+      
+    
+    
+      
+      
+        
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" crossorigin="anonymous">
+        
+      
+    
+
+    
+
+    
+
+  
+
+  
+  
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Montserrat:400,700|Roboto:400,400italic,700|Roboto+Mono">
+  
+
+  <link rel="stylesheet" href="/styles.css">
+  
+  <link rel="stylesheet" href="/css/blue.css">
+  
+
+  
+  
+  
+
+  
+  <link rel="alternate" href="/index.xml" type="application/rss+xml" title="Hassan Rahim Kamil">
+  <link rel="feed" href="/index.xml" type="application/rss+xml" title="Hassan Rahim Kamil">
+  
+
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="icon" type="image/png" href="/img/icon.png">
+  <link rel="apple-touch-icon" type="image/png" href="/img/icon-192.png">
+
+  <link rel="canonical" href="/project/2016-election-ml/sentiment-analysis-on-political-tweets-and-predicting-google-trends-search-queries/">
+
+  
+  
+  
+  
+    
+  
+  <meta property="twitter:card" content="summary_large_image">
+  
+  <meta property="og:site_name" content="Hassan Rahim Kamil">
+  <meta property="og:url" content="/project/2016-election-ml/sentiment-analysis-on-political-tweets-and-predicting-google-trends-search-queries/">
+  <meta property="og:title" content="Sentiment Analysis on Political Tweets and Predicting Google Trends Search Queries | Hassan Rahim Kamil">
+  <meta property="og:description" content="Could we predict political outcomes with sentiments?"><meta property="og:image" content="/project/2016-election-ml/sentiment-analysis-on-political-tweets-and-predicting-google-trends-search-queries/featured.jpg">
+  <meta property="og:locale" content="en-us">
+  
+  <meta property="article:published_time" content="2019-01-06T00:00:00&#43;00:00">
+  
+  <meta property="article:modified_time" content="2019-01-06T00:00:00&#43;00:00">
+  
+
+  
+
+  
+
+  <title>Sentiment Analysis on Political Tweets and Predicting Google Trends Search Queries | Hassan Rahim Kamil</title>
+
+</head>
+<body id="top" data-spy="scroll" data-target="#TableOfContents" data-offset="71" >
+  <aside class="search-results" id="search">
+  <div class="container">
+    <section class="search-header">
+
+      <div class="row no-gutters justify-content-between mb-3">
+        <div class="col-6">
+          <h1>Search</h1>
+        </div>
+        <div class="col-6 col-search-close">
+          <a class="js-search" href="#"><i class="fas fa-times-circle text-muted" aria-hidden="true"></i></a>
+        </div>
+      </div>
+
+      <div id="search-box">
+        
+        <input name="q" id="search-query" placeholder="Search..." autocapitalize="off"
+        autocomplete="off" autocorrect="off" role="textbox" spellcheck="false" type="search">
+        
+      </div>
+
+    </section>
+    <section class="section-search-results">
+
+      <div id="search-hits">
+        
+      </div>
+
+    </section>
+  </div>
+</aside>
+
+
+<nav class="navbar navbar-light fixed-top navbar-expand-lg py-0" id="navbar-main">
+  <div class="container">
+
+    
+      <a class="navbar-brand" href="/">Hassan Rahim Kamil</a>
+      
+      <button type="button" class="navbar-toggler" data-toggle="collapse"
+              data-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+        <span><i class="fas fa-bars"></i></span>
+      </button>
+      
+
+    
+    <div class="collapse navbar-collapse" id="navbar">
+
+      
+      
+      <ul class="navbar-nav ml-auto">
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#about">
+            
+            <span>Home</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#posts">
+            
+            <span>Posts</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#projects">
+            
+            <span>Projects</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#softwares">
+            
+            <span>Softwares</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#haikus">
+            
+            <span>Haikus</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#contact">
+            
+            <span>Contact</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+      
+
+        
+
+        
+        <li class="nav-item">
+          <a class="nav-link js-search" href="#"><i class="fas fa-search" aria-hidden="true"></i></a>
+        </li>
+        
+
+        
+
+        
+        <li class="nav-item">
+          <a class="nav-link js-dark-toggle" href="#"><i class="fas fa-moon" aria-hidden="true"></i></a>
+        </li>
+        
+
+      </ul>
+
+    </div>
+  </div>
+</nav>
+
+
+<article class="article article-project" itemscope itemtype="http://schema.org/Article">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="article-header d-xl-none">
+  <div class="featured-image" style="background-image: url('/project/2016-election-ml/sentiment-analysis-on-political-tweets-and-predicting-google-trends-search-queries/featured_hu5024b0a2edd0446ec8ba944be5a5327a_184888_800x0_resize_q75_box.jpg');"></div>
+  
+</div>
+
+
+<div class="container-fluid split-header d-none d-xl-block">
+  <div class="row">
+    <div class="col-6">
+      <div class="split-header-content">
+        <h1 itemprop="name">Sentiment Analysis on Political Tweets and Predicting Google Trends Search Queries</h1>
+
+        
+
+        
+
+<div class="article-metadata">
+
+  
+  
+  <span itemscope itemprop="author" itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Hassan Rahim Kamil">
+  </span>
+  
+
+  <span class="article-date">
+    
+    <meta content="2019-01-06 00:00:00 &#43;0000 UTC" itemprop="datePublished">
+    <time datetime="2019-01-06 00:00:00 &#43;0000 UTC" itemprop="dateModified">
+      Jan 6, 2019
+    </time>
+  </span>
+  <span itemscope itemprop="publisher" itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Hassan Rahim Kamil">
+  </span>
+
+  
+
+  
+  
+
+  
+  
+  
+  <span class="middot-divider"></span>
+  <span class="article-categories">
+    <i class="fas fa-folder"></i>
+    
+    <a href="/categories/r/">R</a>
+    
+  </span>
+  
+  
+
+  
+
+</div>
+
+
+        
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+        
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    <li>
+      <a class="twitter"
+         href="https://twitter.com/intent/tweet?text=Sentiment%20Analysis%20on%20Political%20Tweets%20and%20Predicting%20Google%20Trends%20Search%20Queries&amp;url=%2fproject%2f2016-election-ml%2fsentiment-analysis-on-political-tweets-and-predicting-google-trends-search-queries%2f"
+         target="_blank" rel="noopener">
+        <i class="fab fa-twitter"></i>
+      </a>
+    </li>
+    <li>
+      <a class="facebook"
+         href="https://www.facebook.com/sharer.php?u=%2fproject%2f2016-election-ml%2fsentiment-analysis-on-political-tweets-and-predicting-google-trends-search-queries%2f"
+         target="_blank" rel="noopener">
+        <i class="fab fa-facebook-f"></i>
+      </a>
+    </li>
+    <li>
+      <a class="linkedin"
+         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=%2fproject%2f2016-election-ml%2fsentiment-analysis-on-political-tweets-and-predicting-google-trends-search-queries%2f&amp;title=Sentiment%20Analysis%20on%20Political%20Tweets%20and%20Predicting%20Google%20Trends%20Search%20Queries"
+         target="_blank" rel="noopener">
+        <i class="fab fa-linkedin-in"></i>
+      </a>
+    </li>
+    <li>
+      <a class="weibo"
+         href="http://service.weibo.com/share/share.php?url=%2fproject%2f2016-election-ml%2fsentiment-analysis-on-political-tweets-and-predicting-google-trends-search-queries%2f&amp;title=Sentiment%20Analysis%20on%20Political%20Tweets%20and%20Predicting%20Google%20Trends%20Search%20Queries"
+         target="_blank" rel="noopener">
+        <i class="fab fa-weibo"></i>
+      </a>
+    </li>
+    <li>
+      <a class="email"
+         href="mailto:?subject=Sentiment%20Analysis%20on%20Political%20Tweets%20and%20Predicting%20Google%20Trends%20Search%20Queries&amp;body=%2fproject%2f2016-election-ml%2fsentiment-analysis-on-political-tweets-and-predicting-google-trends-search-queries%2f">
+        <i class="fas fa-envelope"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+      </div>
+    </div>
+    <div class="col-6">
+      <div class="split-header-image">
+        <img src="/project/2016-election-ml/sentiment-analysis-on-political-tweets-and-predicting-google-trends-search-queries/featured_hu5024b0a2edd0446ec8ba944be5a5327a_184888_680x500_fill_q90_box_smart1.jpg" itemprop="image" alt="">
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="article-container d-xl-none">
+  <h1 itemprop="name">Sentiment Analysis on Political Tweets and Predicting Google Trends Search Queries</h1>
+
+  
+
+  
+
+<div class="article-metadata">
+
+  
+  
+  <span itemscope itemprop="author" itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Hassan Rahim Kamil">
+  </span>
+  
+
+  <span class="article-date">
+    
+    <meta content="2019-01-06 00:00:00 &#43;0000 UTC" itemprop="datePublished">
+    <time datetime="2019-01-06 00:00:00 &#43;0000 UTC" itemprop="dateModified">
+      Jan 6, 2019
+    </time>
+  </span>
+  <span itemscope itemprop="publisher" itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Hassan Rahim Kamil">
+  </span>
+
+  
+
+  
+  
+
+  
+  
+  
+  <span class="middot-divider"></span>
+  <span class="article-categories">
+    <i class="fas fa-folder"></i>
+    
+    <a href="/categories/r/">R</a>
+    
+  </span>
+  
+  
+
+  
+  
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    <li>
+      <a class="twitter"
+         href="https://twitter.com/intent/tweet?text=Sentiment%20Analysis%20on%20Political%20Tweets%20and%20Predicting%20Google%20Trends%20Search%20Queries&amp;url=%2fproject%2f2016-election-ml%2fsentiment-analysis-on-political-tweets-and-predicting-google-trends-search-queries%2f"
+         target="_blank" rel="noopener">
+        <i class="fab fa-twitter"></i>
+      </a>
+    </li>
+    <li>
+      <a class="facebook"
+         href="https://www.facebook.com/sharer.php?u=%2fproject%2f2016-election-ml%2fsentiment-analysis-on-political-tweets-and-predicting-google-trends-search-queries%2f"
+         target="_blank" rel="noopener">
+        <i class="fab fa-facebook-f"></i>
+      </a>
+    </li>
+    <li>
+      <a class="linkedin"
+         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=%2fproject%2f2016-election-ml%2fsentiment-analysis-on-political-tweets-and-predicting-google-trends-search-queries%2f&amp;title=Sentiment%20Analysis%20on%20Political%20Tweets%20and%20Predicting%20Google%20Trends%20Search%20Queries"
+         target="_blank" rel="noopener">
+        <i class="fab fa-linkedin-in"></i>
+      </a>
+    </li>
+    <li>
+      <a class="weibo"
+         href="http://service.weibo.com/share/share.php?url=%2fproject%2f2016-election-ml%2fsentiment-analysis-on-political-tweets-and-predicting-google-trends-search-queries%2f&amp;title=Sentiment%20Analysis%20on%20Political%20Tweets%20and%20Predicting%20Google%20Trends%20Search%20Queries"
+         target="_blank" rel="noopener">
+        <i class="fab fa-weibo"></i>
+      </a>
+    </li>
+    <li>
+      <a class="email"
+         href="mailto:?subject=Sentiment%20Analysis%20on%20Political%20Tweets%20and%20Predicting%20Google%20Trends%20Search%20Queries&amp;body=%2fproject%2f2016-election-ml%2fsentiment-analysis-on-political-tweets-and-predicting-google-trends-search-queries%2f">
+        <i class="fas fa-envelope"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+  
+
+</div>
+
+
+  
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+</div>
+
+
+
+  <div class="article-container">
+
+    <div class="article-style" itemprop="articleBody">
+      
+
+
+<p>Microblogging is becoming more and more ubiquitous among today’s generation. In fact, interactions on some type of online platform or service such as Facebook, Twitter or Google leave traces of data that show a record of behavior or actions. As Davidowitz put it in his book <em>Everybody Lies</em>: “The everyday act of typing a word or phrase into a compact, rectangular white box leaves a small trace of truth that, when multiplied by millions, eventually reveals profound realities.” To statisticians, this quote faintly reminds of the many statistical ideas that could be put to the test.</p>
+<p>An emerging role of online platforms has been in the political context. As such, our research interest would be to predict political outcomes with a preferred dataset that is in line with our hypothesis and allows us to scientifically control for many variables.</p>
+<blockquote>
+<p>Hypothesis: We could use sentiments on social media to predict public opinions as a proxy for political outcomes.</p>
+</blockquote>
+<p>The scope of the preferred dataset(s) that we are looking into include observations</p>
+<ul>
+<li>whose geolocations match those of the political outcomes of interest.</li>
+<li>represent the voter base. And;</li>
+<li>are longitudinal.</li>
+</ul>
+<p>To that end, we gathered the following dataset from <a href="https://www.kaggle.com/benhamner/clinton-trump-tweets">Kaggle</a>:</p>
+<div id="hillary-clinton-and-donald-trump-tweets" class="section level4">
+<h4><strong>Hillary Clinton and Donald Trump Tweets</strong></h4>
+<table>
+<thead>
+<tr class="header">
+<th>Features</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>handle</td>
+<td>Twitter handle name</td>
+</tr>
+<tr class="even">
+<td>text</td>
+<td>Tweets</td>
+</tr>
+<tr class="odd">
+<td>is_retweet</td>
+<td>Whether the tweet was retweeted</td>
+</tr>
+<tr class="even">
+<td>original_author</td>
+<td>Original author</td>
+</tr>
+<tr class="odd">
+<td>time</td>
+<td>Timestamp</td>
+</tr>
+<tr class="even">
+<td>in_reply_to_screen_name</td>
+<td>-</td>
+</tr>
+<tr class="odd">
+<td>in_reply_to_status_id</td>
+<td>-</td>
+</tr>
+<tr class="even">
+<td>in_reply_to_user_id</td>
+<td>-</td>
+</tr>
+<tr class="odd">
+<td>is_quote_status</td>
+<td>Whether the tweet was quoted</td>
+</tr>
+<tr class="even">
+<td>lang</td>
+<td>Twitter’s guess at language</td>
+</tr>
+<tr class="odd">
+<td>retweet_count</td>
+<td>Retweet count</td>
+</tr>
+<tr class="even">
+<td>favorite_count</td>
+<td>Favorite count</td>
+</tr>
+<tr class="odd">
+<td>longitude</td>
+<td>Longitude</td>
+</tr>
+<tr class="even">
+<td>latitude</td>
+<td>Latitude</td>
+</tr>
+<tr class="odd">
+<td>place_id</td>
+<td>Place id</td>
+</tr>
+<tr class="even">
+<td>place_full_name</td>
+<td>Place full name</td>
+</tr>
+<tr class="odd">
+<td>place_name</td>
+<td>Place name</td>
+</tr>
+<tr class="even">
+<td>place_type</td>
+<td>Place type</td>
+</tr>
+<tr class="odd">
+<td>place_country_code</td>
+<td>Country code</td>
+</tr>
+<tr class="even">
+<td>place_country</td>
+<td>Country</td>
+</tr>
+<tr class="odd">
+<td>place_contained_within</td>
+<td>Place contained within</td>
+</tr>
+<tr class="even">
+<td>place_attributes</td>
+<td>Place attributes</td>
+</tr>
+<tr class="odd">
+<td>place_bounding_box</td>
+<td>Place bounding box</td>
+</tr>
+<tr class="even">
+<td>source_url</td>
+<td>Tweet source url</td>
+</tr>
+<tr class="odd">
+<td>truncated</td>
+<td>Whether it is truncated</td>
+</tr>
+<tr class="even">
+<td>entities</td>
+<td>a JSON object</td>
+</tr>
+<tr class="odd">
+<td>extended_entities</td>
+<td>Another JSON object</td>
+</tr>
+</tbody>
+</table>
+<p>The dimensions of the dataset:</p>
+<pre><code>## [1] 7468    3</code></pre>
+<p>First five observations of both candidates:</p>
+<p><code>@HillaryClinton</code>:</p>
+<pre><code>##                                                                                                                                          text
+## 1         Thank you @_VicenteFdez. You&#39;re right—&quot;su voz es su voto.&quot; So grateful to have your support. #JuntosSePuede https://t.co/j9v2K84AV1
+## 2                   No matter where you live you can make sure you&#39;re registered to vote at https://t.co/tTgeqxNqYm.… https://t.co/tWlu8DiGIg
+## 3 RT @azcentral: The Arizona Republic ed board has endorsed @HillaryClinton. See why: https://t.co/FqStTwkesL via @azcopinions #elections2016
+## 4          20 years after Donald bullied a beauty pageant winner for her weight the real &quot;problem&quot; is...still Donald. https://t.co/ZmqYWuN9px
+## 5                   The question in this election: Who can put the plans into action that will make your life better? https://t.co/XreEY9OicG
+##                  time         handle
+## 1 09-28-2016 02:36:13 HillaryClinton
+## 2 09-28-2016 02:10:42 HillaryClinton
+## 3 09-28-2016 01:19:46 HillaryClinton
+## 4 09-28-2016 01:13:08 HillaryClinton
+## 5 09-28-2016 00:22:34 HillaryClinton</code></pre>
+<p><code>@realDonaldTrump</code>:</p>
+<pre><code>##                                                                                                                                             text
+## 4191 My supporters are the best! $18 million from hard-working people who KNOW what we can be again! Shatter the record: https://t.co/8ZHGyOth0f
+## 4192   Unbelievable evening in Melbourne Florida w/ 15000 supporters- and an additional 12000 who could not get in. Tha… https://t.co/VU5wh2zXBU
+## 4193                      Join me for a 3pm rally - tomorrow at the Mid-America Center in Council Bluffs Iowa! Tickets:… https://t.co/dfzsbICiXc
+## 4194     Once again we will have a government of by and for the people. Join the MOVEMENT today! https://t.co/lWjYDbPHav https://t.co/uYwJrtZkAe
+## 4195 RT @GOP: On National #VoterRegistrationDay make sure you&#39;re registered to vote so we can #MakeAmericaGreatAgain https://t.co/GKcaLkx8C8 ht…
+##                     time          handle
+## 4191 09-28-2016 02:17:06 realDonaldTrump
+## 4192 09-28-2016 01:03:03 realDonaldTrump
+## 4193 09-27-2016 22:13:24 realDonaldTrump
+## 4194 09-27-2016 21:08:22 realDonaldTrump
+## 4195 09-27-2016 20:31:14 realDonaldTrump</code></pre>
+<p>According to <a href="https://trends.google.com/trends/story/election2016">Google Trends</a>, the keywords most searched on Google during the 2016 election are “Abortion”, “Immigration”, “Race Issues”, “Economy”, “Affordable Care Act”, “ISIS”, “Climate Change”, “National Debt”, “Gun Control” and “Voting System.” Using <code>gtrendsR</code>, we randomly picked five of those keywords and queried its search hits by setting <code>geo = &quot;US&quot;</code> to prevent bias.</p>
+<pre class="r"><code>trend1 = gtrends(c(&quot;immigration&quot;, &quot;abortion&quot;, &quot;economy&quot;, &quot;gun control&quot;, &quot;terrorism&quot;), geo = &quot;US&quot;, time = &quot;2016-01-01 2016-12-31&quot;)
+
+plot(trend1)</code></pre>
+<p><img src="/project/2016-election-ML/index_files/figure-html/trend%201-1.png" width="672" /></p>
+<p>Lo and behold, the trends do not differ much when we queried for Trump and Hillary.</p>
+<pre class="r"><code>trend2 = gtrends(c(&quot;hillary&quot;, &quot;trump&quot;), geo = &quot;US&quot;, time = &quot;2016-01-01 2016-12-31&quot;)
+
+plot(trend2)</code></pre>
+<p><img src="/project/2016-election-ML/index_files/figure-html/trend%202-1.png" width="672" /></p>
+<p>The trends show the relative popularity of the search query adjusted by the total number searches and time period. We see that these trends look more similar around mid-campaign.</p>
+<p>Another popular measure of public opinions are by using polls. To that end, we queried <a href="https://elections.huffingtonpost.com/pollster">HuffPost Pollster</a>, a poll that aggregates every poll that claims to represent the population using <code>pollstR</code>.</p>
+<p>We obtained the following charts using the slug <a href="https://elections.huffingtonpost.com/pollster/2016-general-election-trump-vs-clinton">2016-general-election-trump-vs-clinton</a> with <code>pollstR</code>:</p>
+<pre class="r"><code>trend.plot</code></pre>
+<p><img src="/project/2016-election-ML/index_files/figure-html/pollstr%20chart-1.png" width="672" /></p>
+<p>We hypothesize that these trends are invoked by the use of sentiments from both political candidates during their campaigns either through speech or social media. Using the trends as the labels and the sentiments as the features, we could attempt to build a model to find out their relationship.</p>
+</div>
+<div id="literature-review" class="section level2">
+<h2>Literature Review</h2>
+<blockquote>
+<p>If I have seen further it is by standing on the shoulders of Giants.</p>
+<p>— <strong>Isaac Newton</strong></p>
+</blockquote>
+<p>Indeed, the Google search engine is seen as this black box that confounds from the feeblest to the strongest of men. Only until recent years that it is seen as a treasure trove to people who analyze big data. Seth Stephen-Davidowitz, a former data scientist at Google, addressed in his book <em>Everybody Lies: Big Data, New Data and What the Internet Can Tell Us</em> that</p>
+<blockquote>
+<p>… there’s something very comforting about that little white box that people feel very comfortable telling things that they may not tell anybody else about: Their sexual interests, their health problems, their insecurities. And using this anonymous aggregate data we can learn a lot more about people than we’ve really ever known.</p>
+</blockquote>
+<p>This reveals an implicit truth: that these data probably understand people more than they do about themselves. Thus, on account to this, many have studied google search queries in hopes to uncover this social behavior. As the Japanese say there are three faces of self: one you show it to the world, the second you show to your close friends, and the third you don’t show it to anyone. For whatever reason, people seem to comfortable with telling everything to the white little box on a daily basis.</p>
+<p>Another popular metric to “quantify” this social behavior is by using polls that are collected by surveyors. These polls are taken and studied insofar as they represent the population, as written by <a href="https://elections.huffingtonpost.com/pollster/faq">Huffpost Pollster</a>. The survey questions on the polls are designed so much so that that they are unbiased so the survey takers would be able to answer them impartially. However, over the recent years, there have been counless debates against the credibility of the polls.</p>
+<p>As evident during the 2016 US election, Hillary Clinton led the popular votes by a huge margin and that the polls predicted that she would be the one to take oath of office at the beginning of the next term. However, the contrary happened and that our reliance on predictive analytics on reams of data had outstripped the understanding of its limitations: that they are tools of probabilistic estimate, but still quite useful. A <a href="http://www.scitepress.org/Papers/2017/64843/64843.pdf">paper</a> written by Kassraie, Modirshanechi &amp; Aghajan (2017) attempted to do just that. The authors collected tweets from the public during the election and aggregated their sentiments so that they could be used to perform some predictive evaluation onto weekly election polls. They fitted a linear model by first choosing an uncorrelated set of features that would make the regression’s dimensions perpendicular. The poll ratings are then used as the response. The results are shown on these graphs:</p>
+<div class="figure">
+<img src="/post/2019-01-06-sentiment-analysis-on-political-tweets-and-predicting-google-trends-search-queries_files/clinton.png" alt="Figure 1: Predicting online election polls with sentiment data for Clinton." />
+<p class="caption">Figure 1: Predicting online election polls with sentiment data for Clinton.</p>
+</div>
+<div class="figure">
+<img src="/post/2019-01-06-sentiment-analysis-on-political-tweets-and-predicting-google-trends-search-queries_files/trump.png" alt="Figure 2: Predicting online election polls with sentiment data for Trump." />
+<p class="caption">Figure 2: Predicting online election polls with sentiment data for Trump.</p>
+</div>
+<p>As far as prediction goes, using sentiments on social media to predict election polls can be seen as a viable choice given the above result. Of the two predictions, the model on Clinton achieved a mean error of 0.50 % and that on Trump achieved a mean error of 1.08 %.</p>
+<p>As alluded previously, prediction using polls as a means of predicting political outcomes has received many criticisms. One of the criticisms allegedly claimed that polls failed to capture the caprice of voters. For example, a Trump loyalist may vote in favor of the opposing party on the online polls but might have behaved otherwise when they cast ballot. For this reason and more, we will attempt to predict social behavior by using as Google Trends with our Twitter dataset.</p>
+</div>
+<div id="approach-design-analysis" class="section level2">
+<h2>Approach/ Design/ Analysis</h2>
+<div id="sentiment-analysis" class="section level3">
+<h3>Sentiment Analysis</h3>
+<p>Before performing any ML algorithm on our dataset, let us take a peek into it by performing some sentiment analysis. After “cleaning” the tweets by removing the links, special characters, and stop words, we could obtain the following plots:</p>
+<p><img src="/project/2016-election-ML/index_files/figure-html/pre%20sentiment%20analysis-1.png" width="672" /></p>
+<p>This plot shows the number of sentiments used by each candidate over time. Note that this sentiment analysis is based on the frequency at which the word appear on the Twitter dataset. From the plot, we could generally see that one of the candidate’s sentiments are more geared towards the negative, while the other seems remain stable around the positive side fof the rhetoric.</p>
+<p><img src="/project/2016-election-ML/index_files/figure-html/word%20count-1.png" width="672" /></p>
+<p>Now, from this plot, we can see the words that are contributing to the sentiments from the most positive to the most negative. Here, we chose the words that appear at least 35 times for better interpretation. Knowing this information is useful in designing and validating our hypothesis.</p>
+</div>
+<div id="prediction" class="section level3">
+<h3>Prediction</h3>
+<p>Define a popularity vector <span class="math inline">\(\mathbf{P}\)</span> as</p>
+<p><span class="math display">\[\mathbf{P} = \frac{|\{w_i : w_i \in W\} |_t}{|W|_t} \in \{[0, 1]\}_{t=1}^n\]</span></p>
+<p>, which is approximately how the Google Trend’s search hits are defined after adjusting for time. We want to estimate <span class="math inline">\(\mathbf{\hat{P}}\)</span> using the sentiments to predict social behavior.</p>
+<p>To that end, we would like to design a document-term matrix by keeping only the sentiments and and then fit several models to estimate the Google Trends.</p>
+<div id="cleaning-the-data" class="section level5">
+<h5>1) <strong>Cleaning the data</strong></h5>
+<p>We are mostly interested in the tweets of the dataset and their timestamps, hence we would like to clean them so that we will only get the sentiments to obtain the document-term matrix. We will use the <code>tm</code> package to achieve that.</p>
+<p>The following code is used to obtain the document-term matrix:</p>
+<pre class="r"><code># Obtaining a corpus object
+
+corpus = as.character(tweets_mutated[, &quot;tweets&quot;]) %&gt;%
+  removeURL %&gt;%
+  removeSpecial %&gt;%
+  stemWord %&gt;%
+  VectorSource %&gt;%
+  VCorpus
+
+# Transforming the corpus
+ 
+cleaned_corpus = tm_map(corpus, tolower) %&gt;%
+  tm_map(PlainTextDocument) %&gt;%
+  tm_map(removePunctuation) %&gt;%
+  tm_map(removeNumbers) %&gt;%
+  tm_map(removeWords, stopwords(&quot;english&quot;)) %&gt;%
+  tm_map(stripWhitespace)
+ 
+# Obtaining the Document Term Matrix
+ 
+DTM = DocumentTermMatrix(cleaned_corpus) %&gt;% 
+  removeSparseTerms(0.99) %&gt;%
+  as.matrix
+
+# Merging the data
+
+res_H = cbind.data.frame(DTM, &quot;hits&quot; = tweets_mutated$hillary_hits/100 )
+res_T = cbind.data.frame(DTM, &quot;hits&quot; = tweets_mutated$trump_hits/100 )</code></pre>
+<p>The idea is to pipeline the tweets from the dataset through a process of transformations. An initial glimpse of the data reveals that the some of the tweets have links and special characters (such as emojis) that needed to be removed, hence we created the functions <code>removeURL</code> and <code>removeSpecial</code> to do just that. Furthermore, we recognized that, depending on the context, some words mean the same thing, hence we had to “stem” the words so that they will return to their original word. A function called <code>hunspell_stem()</code> from the <code>hunspell</code> package allowed us to do just that (and more efficiently than a similar from the <code>tm</code> package). The function is included in the functional <code>stemWord</code> so that the tweets that go through it will return the word in its root form.</p>
+<p>Suppose a vector of characters:</p>
+<pre><code>[1] &quot;loving&quot; &quot;love&quot; &quot;loved&quot; &quot;lovely&quot;
+</code></pre>
+<p>Depending on the context, we would want a vector that would be expressed as following:</p>
+<pre><code>[1] &quot;love&quot; &quot;love&quot; &quot;loved&quot; &quot;love&quot;
+</code></pre>
+<p>This process is important so that the document term matrix can pick up on the frequency at which the sentiments appear since it usually returns a matrix that is sparse and that that would be problematic when interpreting the results. Furthermore, we let the tweets ran through some more functions like <code>tolower</code>,<code>removePunctuation</code>, <code>removeNumbers</code>, <code>removeWords</code> (to remove English stopwords) and <code>stripWhiteSpace</code> to obtain tweets of only sentiments.</p>
+<p>Note that before we had to go through this process, we had to concatenate the strings by each day to match with the number of hits we have since we have too have them by day. This is in line with our hypothesis that the search hits are not only affected by the sentiments invoked by one candidate individually, but rather collectively.</p>
+<p>After transforming the tweets, we transformed them into a document-term matrix and remove sparse terms.</p>
+<p>The dimension of our document-term matrix is:</p>
+<pre class="r"><code>dim(DTM)</code></pre>
+<pre><code>## [1] 268 226</code></pre>
+<p>And now, we are ready to do our analysis.</p>
+</div>
+<div id="logistic-regression" class="section level4">
+<h4>2) <strong>Logistic Regression</strong></h4>
+<p>With the dataset, we attempt to fit a logistic regression since our relative popularity (i.e. search hits) is designed to be bounded from 0 to 1 and signify proportions. First, we will crudely fit the response with all of the features. Once we do that, we will get the following results:</p>
+<div id="hillarys-search-hits-logistic-diagnostic" class="section level5">
+<h5><strong>Hillary’s search hits logistic diagnostic:</strong></h5>
+<p><img src="/project/2016-election-ML/index_files/figure-html/logistic-1.png" width="672" /></p>
+</div>
+<div id="trumps-search-hits-logistic-diagnostic" class="section level5">
+<h5><strong>Trump’s search hits logistic diagnostic:</strong></h5>
+<p><img src="/project/2016-election-ML/index_files/figure-html/trump%20logistic-1.png" width="672" /></p>
+<p>If we look at the diagnostic, we see that none of the assumptions for inference are violated, so we could easily perform the usual hypothesis testings. From the plots, we see that we almost perfectly fit the trends with the given design matrix. For both of the models, we obtain the following Mean Squared Error (MSE):</p>
+<pre class="r"><code># MSE for Hillary&#39;s model (adjusted for scale)
+mse(logit_H$fitted.values,res_H$hits)*100^2</code></pre>
+<pre><code>## [1] 1.043019</code></pre>
+<pre class="r"><code># MSE for Trump&#39;s model (adjusted for scale)
+mse(logit_T$fitted.values,res_T$hits)*100^2</code></pre>
+<pre><code>## [1] 22.39258</code></pre>
+<p>However, if we care about parsimony, we may wish to perform some variable selection with AIC since AIC generally works well with prediction and that it penalizes much less. To that end, we will use the <code>stepAIC()</code> function:</p>
+<pre class="r"><code># Number of features used
+
+## On Hillary&#39;s GTrends
+length(AIC.glm_H$coefficients) - 1 </code></pre>
+<pre><code>## [1] 226</code></pre>
+<pre class="r"><code>## On Trump&#39;s GTrends 
+length(AIC.glm_T$coefficients) - 1 </code></pre>
+<pre><code>## [1] 226</code></pre>
+<p>We see that none of the variables were penalized, hence the MSEs for both models remain the same. This variable selection method does work that well because the directional variable selection has a one-way solution path thus it may not exhaust all possible subset selection.</p>
+</div>
+</div>
+<div id="lasso-vs-ridge-regressions" class="section level4">
+<h4>3) <strong>LASSO vs Ridge Regressions</strong></h4>
+<p>We may also be interested in doing a penalized linear regressions to find out which variables matter more in the estimate. Two of the most common penalized regressions are the LASSO and Ridge regressions, with the former penalizes the coefficients more. Since our design matrix is a document-term matrix, some terms may not be that useful, hence using the penalized regressions can help us ignore those variables. We attempt to tune the penalty for LASSO first:</p>
+<pre class="r"><code># LASSO fit for Hillary
+cvH.fit=cv.glmnet(as.matrix(res_H[,1:227]),as.matrix(res_H$hits),type.measure=&quot;mse&quot;)
+plot(cvH.fit)</code></pre>
+<p><img src="/project/2016-election-ML/index_files/figure-html/lasso-1.png" width="672" /></p>
+<pre class="r"><code># LASSO fit for Trump
+cvT.fit=cv.glmnet(as.matrix(res_T[,1:227]),as.matrix(res_T$hits),type.measure=&quot;mse&quot;)
+plot(cvT.fit)</code></pre>
+<p><img src="/project/2016-election-ML/index_files/figure-html/lasso-2.png" width="672" /></p>
+<pre class="r"><code># The tuning parameters
+
+## For Hillary
+cvH.fit$lambda.1se</code></pre>
+<pre><code>## [1] 0.001972102</code></pre>
+<pre class="r"><code>## For Trump
+cvT.fit$lambda.1se</code></pre>
+<pre><code>## [1] 0.0046166</code></pre>
+<p>The parameters chosen here are the ones that minimize the MSE, hence we will be using them as the parameter to fit our models.</p>
+<pre class="r"><code>## MSE for Hillary&#39;s LASSO model (adjusted for scale)
+mse(yhat111,res_H$hits)*100^2</code></pre>
+<pre><code>## [1] 0.03889185</code></pre>
+<pre class="r"><code>## MSE for Trump&#39;s LASSO model (adjusted for scale)
+mse(yhat222,res_T$hits)*100^2</code></pre>
+<pre><code>## [1] 0.21313</code></pre>
+<p>We see that the MSE for both of the plots seem to fit perfectly, which is a concern since we have a sparse matrix. Due to this, performing a gradient descent will not be meaningful.</p>
+<p>Futhermore, we may now wish to perform a Ridge regression.</p>
+<pre class="r"><code># Define a sequence of lambdas
+l = seq(0, 1000, by = 0.01)
+
+# Fitting the models with lambdas
+ridge.H = lm.ridge(hits~., res_H, lambda = l)
+ridge.T = lm.ridge(hits~., res_T, lambda = l)
+
+# Plotting GCV against lambdas
+
+plot(ridge.H$lambda, ridge.H$GCV, col = &quot;darkorange&quot; ,type = &quot;l&quot;, ylab = &quot;GCV&quot;, xlab = &quot;lambda&quot;, main = &quot;GCV against lambdas for Hillary&#39;s Ridge Regression&quot;)</code></pre>
+<p><img src="/project/2016-election-ML/index_files/figure-html/ridge%20regression-1.png" width="672" /></p>
+<pre class="r"><code>plot(ridge.T$lambda, ridge.T$GCV, col = &quot;darkorange&quot; ,type = &quot;l&quot;, ylab = &quot;GCV&quot;, xlab = &quot;lambda&quot;, main = &quot;GCV against lambdas for Trump&#39;s Ridge Regression&quot;)</code></pre>
+<p><img src="/project/2016-election-ML/index_files/figure-html/ridge%20regression-2.png" width="672" /></p>
+<p>Similar to LASSO, the Ridge regression has the same tuning parameter for penalty, which we will tune differently than LASSO by using the GCV metric. After obtaining the minimum GCV that corresponds with the lambdas, we will then use that lambda to fit our models.</p>
+<p>The following are the MSE’s for both models:</p>
+<pre class="r"><code>## MSE for Hillary&#39;s Ridge model (adjusted for scale)
+mse(y.pred.H,res_H$hits)*100^2</code></pre>
+<pre><code>## [1] 14.93831</code></pre>
+<pre class="r"><code>## MSE for Trump&#39;s Ridge model (adjusted for scale)
+mse(y.pred.T, res_T$hits)*100^2</code></pre>
+<pre><code>## [1] 130.2933</code></pre>
+<p>We see that Ridge regressions perform badly for Trump’s Google Trends hits relative to that of Hillary. We say that this might be due to the sharp peaks that the Trump’s hits may have, or that maybe it is due to the dataset being collected since Trump’s tweets are fewer than Hillary’s.</p>
+</div>
+<div id="random-forest" class="section level4">
+<h4>4) <strong>Random Forest</strong></h4>
+<p>With Random forest we first try the default version, and realize that by simply doing <code>randomForest()</code> and setting up the <code>ntree</code> we still have a pretty bad model. Therefore we start tunning the parameters of <code>mtry</code> and ‘nodesize’:</p>
+<p>We can see that Clinton ’s optimal <code>mtry</code> is 80 and optimal <code>nodesize</code> is 32. Trump’s optimal <code>mtry</code> is 77 and its optimal <code>nodesize</code> is 37.</p>
+<p><img src="/project/2016-election-ML/index_files/figure-html/random%20Forest-1.png" width="672" /><img src="/project/2016-election-ML/index_files/figure-html/random%20Forest-2.png" width="672" /></p>
+<p>From the variable importance plots of both models, the term <code>candidates</code> seem to show up the most in both.</p>
+<p>The result of the Mean Squared Errors are listed as follows:</p>
+<pre class="r"><code>## MSE for Hillary&#39;s RF model (adjusted for scale)
+mse(rf.H$predicted, res_H$hits)*100^2</code></pre>
+<pre><code>## [1] 35.92742</code></pre>
+<pre class="r"><code>## MSE for Trump&#39;s RF model (adjusted for scale)
+mse(rf.T$predicted, res_T$hits)*100^2</code></pre>
+<pre><code>## [1] 224.5075</code></pre>
+</div>
+<div id="feature-selection" class="section level4">
+<h4>5) <strong>Feature Selection</strong></h4>
+<p>We could attempt to find the features that greatly affect the prediction. However, since we have features of only factor variables, computing the distance matrices may be a problem. As such, we could use the <code>FactoMineR</code> package to solve this problem since it would allow us to compute the principal components for mixed variables</p>
+<pre class="r"><code>fact = res_H[,1:226] %&gt;% lapply(as.factor) %&gt;% do.call(cbind, .)
+res.pca=PCA(fact[,1:226])</code></pre>
+<p><img src="/project/2016-election-ML/index_files/figure-html/principal%20component-1.png" width="672" /><img src="/project/2016-election-ML/index_files/figure-html/principal%20component-2.png" width="672" /></p>
+<p>We see that doing a feature selection by PCA from each of the plots since they did not contribute too much to the explanations of the variance for both dimensions. Therefore, we say that using PCA on a document-term matrix may not work that well since our variables are not continuous.</p>
+</div>
+</div>
+<div id="discussion" class="section level3">
+<h3>Discussion</h3>
+<p>From the results, we see that the outcome of our prediction vary a lot based on the characteristics of the methods we applied and how certain methods are impacted by the data sets.</p>
+<p>For the logistic model, by applying AIC for variable selection, we see that none of the variables were removed. This method may not work that well since the solution path may be one-way only, not exhaustive. Another method that we could have done is to use the best subset selection, which does an exhaustive search on all features to find the best subset of features that would fit the model best.</p>
+<p>For the penalized regression models, we see that we encounter a problem with overfitting for the LASSO regression model. This may be due to the document term matrix being sparse, so LASSO had to force its ranks on all the covariates. Although we fit an almost perfect linear model with substantially low MSE, this may not be desirable if we take into account parsimony and the bias-variance tradeoff. For the Ridge regression, we found out that the model on Trump’s search hits did not work that well. If we examine the comparison plots closely, we found that the predicted values did not fit well when the trend had some sharp peaks. Furthermore, this may be due to the fact that Trump’s tweets are fewer than Hillary’s, which may have caused the fitted model to work better using Hillary’s search hits than Trump’s.</p>
+<p>Using the method of Random Forest, we found that the models did not work that well, even after the we tune for <code>mtry</code> around <code>p/3</code> and various <code>nodesize</code>. The variable importance also here used IncNodePurity, which may be the default for sparse document term matrix. We also realized that the <code>randomForest()</code> did not list the coefficients for our model, which may also be caused by the model matrix being sparse.</p>
+<p>To summarize the methods, we computed the MSEs for each method to compare and contrast:</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">Method</th>
+<th align="center">Trump</th>
+<th align="center">Hillary</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Logistic</td>
+<td align="center">22.43</td>
+<td align="center">1.05</td>
+</tr>
+<tr class="even">
+<td align="center">LASSO</td>
+<td align="center">0.21</td>
+<td align="center">0.04</td>
+</tr>
+<tr class="odd">
+<td align="center">Ridge</td>
+<td align="center">130.35</td>
+<td align="center">15.09</td>
+</tr>
+<tr class="even">
+<td align="center">Random Forest</td>
+<td align="center">227.79</td>
+<td align="center">36.75</td>
+</tr>
+</tbody>
+</table>
+<p>We see that among the fitted models, the LASSO regression works the best in terms of Mean Squared Errors, while Random Forest performed the worst even after tuning the parameters <code>mtry</code> and <code>nodesize</code>. To present a visual result, we produced the following plots:</p>
+<pre class="r"><code>H.comparison.plot</code></pre>
+<p><img src="/project/2016-election-ML/index_files/figure-html/comparison%20plots%202-1.png" width="672" /></p>
+<pre class="r"><code>T.comparison.plot</code></pre>
+<p><img src="/project/2016-election-ML/index_files/figure-html/comparison%20plots%202-2.png" width="672" /></p>
+<p>We can see from the visualization which methods follow the patterns well.</p>
+<p>Finally, for the feature selection, we used the PCA method to find the features that would explain the variation the most. Given that we have columns of almost binary values, PCA would not work that well since it works best for continous variables. As can be seen from the PCA variance plot, only 7.4% of variation is explained by the terms in the document-term matrix. Another method that could have been done is by using Non-Negative Matrix Factorization (NMF), which may work well on a document-term matrix whose sentiments express themselves well in terms of frequencies at each document.</p>
+</div>
+<div id="conclusion" class="section level3">
+<h3>Conclusion</h3>
+<p>In conclusion, we can able to say that the sentiments on social media can predict public opinions as a proxy for political outcomes. Our potential pitfalls might be that the number of characters are pretty small for the data set by looking at <code>nchar()</code>, resulting in fewer sentiments for our analysis. If we are doing similar analysis in the future, we might choose data set with greater density for both candidates of the prediction and perform classification to the tweets into any class we are interested in if we have more time.</p>
+</div>
+<div id="reference" class="section level3">
+<h3>Reference</h3>
+<p>Kassraie, Modirshanechi &amp; Aghajan. (2017). “Election Vote Share Prediction using a Sentiment-based Fusion of Twitter Data with Google Trends and Online Polls.” <em>Scite Press</em>, <a href="http://www.scitepress.org/Papers/2017/64843/64843.pdf" class="uri">http://www.scitepress.org/Papers/2017/64843/64843.pdf</a></p>
+<p>Stephens-Davidowitz, Seth. (2017). “Everybody Lies: Big Data, New Data, and What the Internet Can Tell Us About Who We Really Are.” <em>The B&amp;N Sci-Fi and Fantasy Blog</em>, Barnes &amp; Noble Reads, <a href="https://www.barnesandnoble.com/w/everybody-lies-seth-stephens-davidowitz/1125687298" class="uri">https://www.barnesandnoble.com/w/everybody-lies-seth-stephens-davidowitz/1125687298</a></p>
+</div>
+</div>
+
+    </div>
+
+    
+
+
+<div class="article-tags">
+  
+  <a class="badge badge-light" href="/tags/sentiment-analysis/">Sentiment Analysis</a>
+  
+  <a class="badge badge-light" href="/tags/supervised-learning/">Supervised Learning</a>
+  
+</div>
+
+
+
+    
+
+
+
+
+
+
+<div class="media author-card" itemscope itemtype="http://schema.org/Person">
+  
+  <img class="portrait mr-3" src="/img/portrait.jpg" itemprop="image" alt="Avatar">
+  
+  <div class="media-body">
+    <h5 class="card-title" itemprop="name"><a href="/">Hassan Rahim Kamil</a></h5>
+    <h6 class="card-subtitle">Course Assistant</h6>
+    
+    <ul class="network-icon" aria-hidden="true">
+      
+      
+      
+      
+        
+      
+      
+      
+      
+      
+        
+      
+      <li>
+        <a itemprop="sameAs" href="/#contact" >
+          <i class="fas fa-envelope"></i>
+        </a>
+      </li>
+      
+      
+      
+      
+        
+      
+      
+      
+      
+      
+        
+      
+      <li>
+        <a itemprop="sameAs" href="https://twitter.com/HassanNasru" target="_blank" rel="noopener">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+      
+      
+      
+      
+        
+      
+      
+      
+      
+      
+        
+      
+      <li>
+        <a itemprop="sameAs" href="https://www.kaggle.com/hassanrk" target="_blank" rel="noopener">
+          <i class="fab fa-kaggle"></i>
+        </a>
+      </li>
+      
+      
+      
+      
+        
+      
+      
+      
+      
+      
+        
+      
+      <li>
+        <a itemprop="sameAs" href="https://stackexchange.com/users/8636946/hassan-rahim-kamil?tab=accounts" target="_blank" rel="noopener">
+          <i class="fab fa-stack-exchange"></i>
+        </a>
+      </li>
+      
+      
+      
+      
+        
+      
+      
+      
+      
+      
+        
+      
+      <li>
+        <a itemprop="sameAs" href="https://github.com/hassanrk" target="_blank" rel="noopener">
+          <i class="fab fa-github"></i>
+        </a>
+      </li>
+      
+      
+      
+      
+        
+      
+      
+      
+      
+      
+        
+      
+      <li>
+        <a itemprop="sameAs" href="https://www.linkedin.com/in/hassan-rahim-kamil-a7a17697/" target="_blank" rel="noopener">
+          <i class="fab fa-linkedin"></i>
+        </a>
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+
+
+
+    
+    
+
+    
+
+      
+      
+      
+
+      
+      
+      
+
+      
+      
+      
+    
+
+  </div>
+</article>
+
+
+
+<div class="container">
+  <footer class="site-footer">
+  
+  <p class="powered-by">
+    <a href="/privacy/">Privacy Policy</a>
+  </p>
+  
+
+  <p class="powered-by">
+    &copy; 2018 &middot; 
+
+    Powered by the
+    <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
+    <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+    
+    <span class="float-right" aria-hidden="true">
+      <a href="#" id="back_to_top">
+        <span class="button_icon">
+          <i class="fas fa-chevron-up fa-2x"></i>
+        </span>
+      </a>
+    </span>
+    
+  </p>
+</footer>
+
+</div>
+
+
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cite</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <pre><code class="tex hljs"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-primary my-1 js-copy-cite" href="#" target="_blank">
+          <i class="fas fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-outline-primary my-1 js-download-cite" href="#" target="_blank">
+          <i class="fas fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+    
+    
+    <script src="/js/mathjax-config.js"></script>
+    
+
+    
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha512-+NqPlbbtM1QqiK8ZAo4Yrj2c4lNQoGv8P79DPtKzj++l5jnN39rHA/xsqn8zE9l0uSoxaCdrOgFs6yjyfbBxSg==" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.3/imagesloaded.pkgd.min.js" integrity="sha512-umsR78NN0D23AzgoZ11K7raBD+R6hqKojyBZs1w8WvYlsI+QuKRGBx3LFCwhatzBunCjDuJpDHwxD13sLMbpRA==" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha256-VsEqElsCHSGmnmHXGQzvoWjWwoznFSZc6hs7ARLRacQ=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.4/isotope.pkgd.min.js" integrity="sha512-VDBOIlDbuC4VWxGJNmuFRQ0Li0SKkDpmGyuhAG5LTDLd/dJ/S0WMVxriR2Y+CyPL5gzjpN4f/6iqWVBJlht0tQ==" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" integrity="sha256-X5PoE3KU5l+JcX+w09p/wHl9AzK333C4hJ2I9S5mD4M=" crossorigin="anonymous"></script>
+
+      
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js" integrity="sha256-/BfiIkHlHoVihZdc6TFuj7MmJ0TWcWsMXkeDFwhi0zw=" crossorigin="anonymous"></script>
+        
+      
+
+      
+      
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_CHTML-full" integrity="sha256-GhM+5JHb6QUzOQPXSJLEWP7R73CbkisjzK5Eyij4U9w=" crossorigin="anonymous" async></script>
+      
+    
+
+    
+    
+
+    
+    
+    
+
+    
+    
+    <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    
+    
+    <script>
+      const search_index_filename = "/index.json";
+      const i18n = {
+        'placeholder': "Search...",
+        'results': "results found",
+        'no_results': "No results found"
+      };
+      const content_type = {
+        'post': "Posts",
+        'project': "Projects",
+        'publication' : "Publications",
+        'talk' : "Talks"
+        };
+    </script>
+    
+
+    
+    
+
+    
+    
+    <script id="search-hit-fuse-template" type="text/x-template">
+      <div class="search-hit" id="summary-{{key}}">
+      <div class="search-hit-content">
+        <div class="search-hit-name">
+          <a href="{{relpermalink}}">{{title}}</a>
+          <div class="article-metadata search-hit-type">{{type}}</div>
+          <p class="search-hit-description">{{snippet}}</p>
+        </div>
+      </div>
+      </div>
+    </script>
+    
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.2.1/fuse.min.js" integrity="sha256-VzgmKYmhsGNNN4Ph1kMW+BjoYJM2jV5i4IlFoeZA9XI=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
+    
+
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    <script src="/js/academic.min.70f0041f5a24c6a675ac218c98d7ef71.js"></script>
+
+    
+
+  </body>
+</html>
+
