@@ -1,2 +1,0 @@
-# blogdown
-publish via blogdown
